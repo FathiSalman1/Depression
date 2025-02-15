@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depression Assessment</title>
+  <style>
+    /* CSS Variables for easy theming */
+    :root {
+      --primary-color: #007BFF;
+      --secondary-color: #6c757d;
+      --background-color: #f8f9fa;
+      --text-color: #333;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Reset and basic styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .question p {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .options label {
+      display: flex;
+      align-items: center;
+      background: var(--background-color);
+      padding: 10px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .options label:hover {
+      background: #e9ecef;
+    }
+
+    .options input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .navigation button {
+      width: 48%;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-content canvas {
+      margin: 20px 0;
+    }
+
+    .modal-content button {
+      width: auto;
+      margin: 0 auto;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .options {
+        flex-direction: column;
+      }
+
+      .options label {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Depression Assessment</h1>
+    <div id="bdi-section">
+      <h2>Beck Depression Inventory (BDI)</h2>
+      <form id="bdi-form">
+        <!-- BDI Questions will be dynamically inserted here -->
+      </form>
+      <div class="navigation">
+        <button onclick="showHDRS()">Next: HDRS</button>
+      </div>
+    </div>
+    <div id="hdrs-section" style="display: none;">
+      <h2>Hamilton Depression Rating Scale (HDRS)</h2>
+      <form id="hdrs-form">
+        <!-- HDRS Questions will be dynamically inserted here -->
+      </form>
+      <div class="navigation">
+        <button onclick="showBDI()">Previous: BDI</button>
+        <button onclick="showPHQ9()">Next: PHQ-9</button>
+      </div>
+    </div>
+    <div id="phq9-section" style="display: none;">
+      <h2>Patient Health Questionnaire-9 (PHQ-9)</h2>
+      <form id="phq9-form">
+        <!-- PHQ-9 Questions will be dynamically inserted here -->
+      </form>
+      <div class="navigation">
+        <button onclick="showHDRS()">Previous: HDRS</button>
+        <button onclick="calculateScores()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Results -->
+  <div id="result-modal" class="modal">
+    <div class="modal-content">
+      <h2>Assessment Results</h2>
+      <canvas id="result-chart"></canvas>
+      <p id="final-result"></p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // Questions for the BDI
+    const bdiQuestions = [
+      "Sadness",
+      "Pessimism",
+      "Past Failure",
+      "Loss of Pleasure",
+      "Guilty Feelings",
+      // Add all 21 questions here
+    ];
+
+    // Questions for the HDRS
+    const hdrsQuestions = [
+      "Depressed Mood",
+      "Feelings of Guilt",
+      "Suicidal Thoughts",
+      "Insomnia (Early)",
+      "Work and Activities",
+      // Add all 17-21 questions here
+    ];
+
+    // Questions for the PHQ-9
+    const phq9Questions = [
+      "Little interest or pleasure in doing things",
+      "Feeling down, depressed, or hopeless",
+      "Trouble falling or staying asleep, or sleeping too much",
+      "Feeling tired or having little energy",
+      "Poor appetite or overeating",
+      "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+      "Trouble concentrating on things, such as reading the newspaper or watching television",
+      "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+      "Thoughts that you would be better off dead or of hurting yourself in some way",
+    ];
+
+    // Initialize answers arrays with zeros
+    const bdiAnswers = new Array(bdiQuestions.length).fill(0);
+    const hdrsAnswers = new Array(hdrsQuestions.length).fill(0);
+    const phq9Answers = new Array(phq9Questions.length).fill(0);
+
+    // Function to render BDI questions
+    function renderBDIQuestions() {
+      const form = document.getElementById("bdi-form");
+      bdiQuestions.forEach((question, index) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <p>${question}</p>
+          <div class="options">
+            ${[0, 1, 2, 3].map(value => `
+              <label>
+                <input
+                  type="radio"
+                  name="bdi-question-${index}"
+                  value="${value}"
+                  onchange="handleBDIAnswer(${index}, ${value})"
+                />
+                ${value}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        form.appendChild(questionDiv);
+      });
+    }
+
+    // Function to render HDRS questions
+    function renderHDRSQuestions() {
+      const form = document.getElementById("hdrs-form");
+      hdrsQuestions.forEach((question, index) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <p>${question}</p>
+          <div class="options">
+            ${[0, 1, 2, 3, 4].map(value => `
+              <label>
+                <input
+                  type="radio"
+                  name="hdrs-question-${index}"
+                  value="${value}"
+                  onchange="handleHDRSAnswer(${index}, ${value})"
+                />
+                ${value}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        form.appendChild(questionDiv);
+      });
+    }
+
+    // Function to render PHQ-9 questions
+    function renderPHQ9Questions() {
+      const form = document.getElementById("phq9-form");
+      phq9Questions.forEach((question, index) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <p>${question}</p>
+          <div class="options">
+            ${[0, 1, 2, 3].map(value => `
+              <label>
+                <input
+                  type="radio"
+                  name="phq9-question-${index}"
+                  value="${value}"
+                  onchange="handlePHQ9Answer(${index}, ${value})"
+                />
+                ${value}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        form.appendChild(questionDiv);
+      });
+    }
+
+    // Function to handle BDI answer selection
+    function handleBDIAnswer(index, value) {
+      bdiAnswers[index] = value;
+    }
+
+    // Function to handle HDRS answer selection
+    function handleHDRSAnswer(index, value) {
+      hdrsAnswers[index] = value;
+    }
+
+    // Function to handle PHQ-9 answer selection
+    function handlePHQ9Answer(index, value) {
+      phq9Answers[index] = value;
+    }
+
+    // Function to calculate and display scores
+    function calculateScores() {
+      const bdiScore = bdiAnswers.reduce((total, score) => total + score, 0);
+      const hdrsScore = hdrsAnswers.reduce((total, score) => total + score, 0);
+      const phq9Score = phq9Answers.reduce((total, score) => total + score, 0);
+
+      const bdiSeverity = getBDISeverity(bdiScore);
+      const hdrsSeverity = getHDRSSeverity(hdrsScore);
+      const phq9Severity = getPHQ9Severity(phq9Score);
+
+      // Calculate the average score
+      const averageScore = ((bdiScore + hdrsScore + phq9Score) / 3).toFixed(2);
+      const finalSeverity = getFinalSeverity(averageScore);
+
+      // Display results in a chart
+      showResultsChart(bdiScore, hdrsScore, phq9Score, bdiSeverity, hdrsSeverity, phq9Severity, averageScore, finalSeverity);
+    }
+
+    // Function to determine BDI severity
+    function getBDISeverity(score) {
+      if (score <= 13) return "Minimal depression";
+      if (score <= 19) return "Mild depression";
+      if (score <= 28) return "Moderate depression";
+      return "Severe depression";
+    }
+
+    // Function to determine HDRS severity
+    function getHDRSSeverity(score) {
+      if (score <= 7) return "Normal";
+      if (score <= 13) return "Mild depression";
+      if (score <= 18) return "Moderate depression";
+      if (score <= 22) return "Severe depression";
+      return "Very severe depression";
+    }
+
+    // Function to determine PHQ-9 severity
+    function getPHQ9Severity(score) {
+      if (score <= 4) return "Minimal depression";
+      if (score <= 9) return "Mild depression";
+      if (score <= 14) return "Moderate depression";
+      if (score <= 19) return "Moderately severe depression";
+      return "Severe depression";
+    }
+
+    // Function to determine final severity based on average score
+    function getFinalSeverity(averageScore) {
+      if (averageScore <= 7) return "Minimal depression";
+      if (averageScore <= 13) return "Mild depression";
+      if (averageScore <= 18) return "Moderate depression";
+      if (averageScore <= 22) return "Severe depression";
+      return "Very severe depression";
+    }
+
+    // Function to show HDRS section
+    function showHDRS() {
+      document.getElementById("bdi-section").style.display = "none";
+      document.getElementById("hdrs-section").style.display = "block";
+      document.getElementById("phq9-section").style.display = "none";
+    }
+
+    // Function to show BDI section
+    function showBDI() {
+      document.getElementById("hdrs-section").style.display = "none";
+      document.getElementById("bdi-section").style.display = "block";
+      document.getElementById("phq9-section").style.display = "none";
+    }
+
+    // Function to show PHQ-9 section
+    function showPHQ9() {
+      document.getElementById("hdrs-section").style.display = "none";
+      document.getElementById("bdi-section").style.display = "none";
+      document.getElementById("phq9-section").style.display = "block";
+    }
+
+    // Function to show results in a chart
+    function showResultsChart(bdiScore, hdrsScore, phq9Score, bdiSeverity, hdrsSeverity, phq9Severity, averageScore, finalSeverity) {
+      const modal = document.getElementById("result-modal");
+      const ctx = document.getElementById("result-chart").getContext("2d");
+
+      // Destroy previous chart instance if it exists
+      if (window.resultChart) {
+        window.resultChart.destroy();
+      }
+
+      // Create a new chart
+      window.resultChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["BDI Score", "HDRS Score", "PHQ-9 Score"],
+          datasets: [{
+            label: "Score",
+            data: [bdiScore, hdrsScore, phq9Score],
+            backgroundColor: ["#007BFF", "#6c757d", "#28a745"],
+            borderWidth: 1,
+          }],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 50, // Adjust based on your scoring range
+            },
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: `BDI: ${bdiSeverity} | HDRS: ${hdrsSeverity} | PHQ-9: ${phq9Severity}`,
+            },
+          },
+        },
+      });
+
+      // Display the final result
+      const finalResultElement = document.getElementById("final-result");
+      finalResultElement.innerHTML = `
+        <strong>Average Score:</strong> ${averageScore}<br>
+        <strong>Final Severity:</strong> ${finalSeverity}
+      `;
+
+      // Show the modal
+      modal.style.display = "flex";
+    }
+
+    // Function to close the modal
+    function closeModal() {
+      const modal = document.getElementById("result-modal");
+      modal.style.display = "none";
+    }
+
+    // Render questions when the page loads
+    window.onload = () => {
+      renderBDIQuestions();
+      renderHDRSQuestions();
+      renderPHQ9Questions();
+    };
+  </script>
+</body>
+</html>

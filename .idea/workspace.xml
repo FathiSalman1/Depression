@@ -4,162 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89ff49ae-8548-4fa9-89af-0bf4e0d7d2a1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/flaskProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/flaskProject.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="89ff49ae-8548-4fa9-89af-0bf4e0d7d2a1" name="Changes" comment="all updates">
+      <change afterPath="$PROJECT_DIR$/static/assets/css/t-style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/assets/js/test-js.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/rtl/test.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/app-calendar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/app-chats.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/app-contacts.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/app-taskboard.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/authentication-login1.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/rtl/authentication-login1.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/authentication-login2.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/authentication-register1.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/authentication-register2.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-c3-axis.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-c3-bar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-c3-data.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-c3-line.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-chart-js.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-chartist.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-echart-bar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-echart-basic.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-echart-pie-doughnut.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-knob.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-morris.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/chart-sparkline.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/component-nestable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/component-noui-slider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/component-rating.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/component-sweetalert.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/component-toastr.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/eco-products-cart.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/eco-products-checkout.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/eco-products-detail.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/eco-products-edit.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/eco-products-orders.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/eco-products.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/email-templete-alert.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/email-templete-basic.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/email-templete-billing.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/email-templete-password-reset.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-basic.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-bootstrap-switch.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-bootstrap-touchspin.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-bootstrap-validation.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-bordered.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-checkbox-radio.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-custom-validation.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-detail.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-dropzone.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-dual-listbox.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-editor-ckeditor.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-editor-quill.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-editor-summernote.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-editor-tinymce.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-horizontal.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-img-cropper.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-input-grid.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-input-groups.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-inputs.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-mask.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-paginator.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-picker-bootstrap-datepicker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-picker-bootstrap-rangepicker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-picker-colorpicker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-picker-datetimepicker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-picker-material-datepicker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-repeater.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-row-separator.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-select2.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-striped-row.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-typeahead.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/form-wizard.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/icon-flag.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/icon-fontawesome.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/icon-material.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/icon-simple-lineicon.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/icon-themify.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/icon-weather.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/inbox-email-compose.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/inbox-email-detail.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/inbox-email.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/rtl/authentication-lockscreen.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/rtl/authentication-lockscreen.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/rtl/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/rtl/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/index2.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/index3.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/layout-inner-fixed-left-sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/layout-inner-fixed-right-sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/layout-inner-left-sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/layout-inner-right-sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/map-google.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/map-vector.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/page-layout-boxed-layout.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/page-layout-fixed-header-sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/page-layout-fixed-header.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/page-layout-fixed-sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-animation.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-block-ui.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-faq.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-gallery.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-invoice-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-invoice.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-lightbox-popup.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-maintenance.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-pricing.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-profile.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-scroll.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-search-result.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-session-idle-timeout.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-session-timeout.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-treeview.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/pages-utility-classes.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/sidebar-type-fullsidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/sidebar-type-horizontalsidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/sidebar-type-iconsidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/sidebar-type-minisidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/sidebar-type-overlaysidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/starter-kit.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-basic.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-dark-basic.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-datatable-advanced.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-datatable-api.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-datatable-basic.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-footable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-jsgrid.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-layout-coloured.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-responsive.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/table-sizing.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ticket-detail.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ticket-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/timeline-center.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/timeline-horizontal.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/timeline-left.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/timeline-right.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-bootstrap.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-breadcrumb.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-buttons.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-card-customs.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-card-draggable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-card-weather.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-cards.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-carousel.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-grid.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-list-media.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-modals.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-notification.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-popover.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-progressbar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-scrollspy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-tab.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-tooltip-popover.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-typography.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-user-card.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/ui-user-contacts.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/widgets-apps.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/widgets-charts.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rtl/widgets-data.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,9 +22,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Flask Main" />
-        <option value="CSS File" />
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="CSS File" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -280,13 +133,30 @@
       <workItem from="1739040207236" duration="6992000" />
       <workItem from="1739048895121" duration="362000" />
       <workItem from="1739056230121" duration="2028000" />
+      <workItem from="1739096134235" duration="1695000" />
+      <workItem from="1739108709065" duration="252000" />
+      <workItem from="1739650369109" duration="372000" />
+      <workItem from="1739651160967" duration="2750000" />
     </task>
+    <task id="LOCAL-00001" summary="all updates">
+      <option name="closed" value="true" />
+      <created>1739096273185</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1739096273185</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="all updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="all updates" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/flaskProject$flaskProject.coverage" NAME="flaskProject Coverage Results" MODIFIED="1739046216998" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/flaskProject$flaskProject.coverage" NAME="flaskProject Coverage Results" MODIFIED="1739653892473" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
