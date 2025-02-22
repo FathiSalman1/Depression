@@ -19,7 +19,7 @@ with app.app_context():
 # Routes
 @app.route('/')
 def login():
-    return render_template('rtl/index.html')
+    return render_template('rtl/authentication-login1.html')
 
 
 @app.route('/index')

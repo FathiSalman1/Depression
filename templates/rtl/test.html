@@ -232,6 +232,14 @@
       "Thoughts that you would be better off dead or of hurting yourself in some way",
     ];
 
+    // Text-based options for answers
+    const answerOptions = [
+      { value: 0, text: "Not at all" },
+      { value: 1, text: "Sometimes" },
+      { value: 2, text: "Often" },
+      { value: 3, text: "Mostly Always" },
+    ];
+
     // Initialize answers arrays with zeros
     const bdiAnswers = new Array(bdiQuestions.length).fill(0);
     const hdrsAnswers = new Array(hdrsQuestions.length).fill(0);
@@ -246,15 +254,15 @@
         questionDiv.innerHTML = `
           <p>${question}</p>
           <div class="options">
-            ${[0, 1, 2, 3].map(value => `
+            ${answerOptions.map(option => `
               <label>
                 <input
                   type="radio"
                   name="bdi-question-${index}"
-                  value="${value}"
-                  onchange="handleBDIAnswer(${index}, ${value})"
+                  value="${option.value}"
+                  onchange="handleBDIAnswer(${index}, ${option.value})"
                 />
-                ${value}
+                ${option.text}
               </label>
             `).join("")}
           </div>
@@ -272,15 +280,15 @@
         questionDiv.innerHTML = `
           <p>${question}</p>
           <div class="options">
-            ${[0, 1, 2, 3, 4].map(value => `
+            ${answerOptions.map(option => `
               <label>
                 <input
                   type="radio"
                   name="hdrs-question-${index}"
-                  value="${value}"
-                  onchange="handleHDRSAnswer(${index}, ${value})"
+                  value="${option.value}"
+                  onchange="handleHDRSAnswer(${index}, ${option.value})"
                 />
-                ${value}
+                ${option.text}
               </label>
             `).join("")}
           </div>
@@ -298,15 +306,15 @@
         questionDiv.innerHTML = `
           <p>${question}</p>
           <div class="options">
-            ${[0, 1, 2, 3].map(value => `
+            ${answerOptions.map(option => `
               <label>
                 <input
                   type="radio"
                   name="phq9-question-${index}"
-                  value="${value}"
-                  onchange="handlePHQ9Answer(${index}, ${value})"
+                  value="${option.value}"
+                  onchange="handlePHQ9Answer(${index}, ${option.value})"
                 />
-                ${value}
+                ${option.text}
               </label>
             `).join("")}
           </div>
