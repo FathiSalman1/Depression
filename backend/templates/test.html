@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="keywords" content="depression test, mental health, assessment">
+  <meta name="description" content="Take our comprehensive depression assessment to evaluate your mental well-being.">
+  <meta name="author" content="">
+  <title>Depression Assessment</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" type="text/css" href="../static/assetes/css/bootstrap.css" />
+
+  <!-- Fonts style -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Owl slider stylesheet (optional, not used here but included for consistency) -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+
+  <!-- Font Awesome style -->
+  <link href="../static/assetes/css/font-awesome.min.css" rel="stylesheet" />
+
+  <!-- Custom styles for this template -->
+  <link href="../static/assetes/css/style.css" rel="stylesheet" />
+  <!-- Responsive style -->
+  <link href="../static/assetes/css/responsive.css" rel="stylesheet" />
+
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom styles for the assessment and navbar -->
+  <style>
+    .assessment-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .question p {
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .options label {
+      margin-right: 15px;
+      margin-bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .options input[type="radio"] {
+      margin-right: 8px;
+    }
+    .btn-custom {
+      background-color: #f7444e;
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    .btn-custom:hover {
+      background-color: #d9363e;
+      color: #fff;
+    }
+    .modal-content {
+      padding: 20px;
+      border-radius: 10px;
+      background: #fff;
+    }
+    /* Navbar custom styles */
+    .custom_nav-container {
+      background-color: #178066; /* Dark blue background */
+      padding: 10px 15px; /* Optional: adjust padding */
+    }
+    .navbar-brand span {
+      color: #ffffff; /* White text for brand */
+    }
+    .navbar-nav .nav-link {
+      color: #ffffff; /* White text for nav links */
+    }
+    .navbar-nav .nav-link:hover {
+      color: #f7444e; /* Red hover effect to match btn-custom */
+    }
+    .nav_search-btn {
+      background-color: transparent; /* Remove default background */
+      border: none;
+      color: #ffffff; /* White search icon */
+    }
+    .nav_search-btn:hover {
+      color: #f7444e; /* Red hover effect */
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); /* White hamburger icon */
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section with Requested Navbar -->
+  <header class="header_section">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg custom_nav-container ">
+        <a class="navbar-brand" href="/">
+          <span>Depression Test & Meditation</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class=""> </span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="departments.html">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="doctors.html">Experts</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="contact.html">Contact Us</a>
+            </li>
+            <form class="form-inline">
+              <button class="btn my-2 my-sm-0 nav_search-btn" type="submit">
+                <i class="fa fa-search" aria-hidden="true"></i>
+              </button>
+            </form>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Assessment Section -->
+  <section class="layout_padding">
+    <div class="container">
+      <div class="heading_container heading_center">
+        <h2>Depression Assessment</h2>
+        <p>Take our comprehensive test to evaluate your mental well-being using standardized scales.</p>
+      </div>
+      <div class="assessment-container">
+        <div id="bdi-section">
+          <h3>Beck Depression Inventory (BDI)</h3>
+          <form id="bdi-form"></form>
+          <div class="navigation text-center">
+            <button class="btn-custom" onclick="showHDRS()">Next: HDRS</button>
+          </div>
+        </div>
+        <div id="hdrs-section" style="display: none;">
+          <h3>Hamilton Depression Rating Scale (HDRS)</h3>
+          <form id="hdrs-form"></form>
+          <div class="navigation text-center">
+            <button class="btn-custom" onclick="showBDI()">Previous: BDI</button>
+            <button class="btn-custom" onclick="showPHQ9()">Next: PHQ-9</button>
+          </div>
+        </div>
+        <div id="phq9-section" style="display: none;">
+          <h3>Patient Health Questionnaire-9 (PHQ-9)</h3>
+          <form id="phq9-form"></form>
+          <div class="navigation text-center">
+            <button class="btn-custom" onclick="showHDRS()">Previous: HDRS</button>
+            <button class="btn-custom" data-toggle="modal" data-target="#resultModal" onclick="calculateScores()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal for Results -->
+  <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resultModalLabel">Assessment Results</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <canvas id="result-chart"></canvas>
+          <p id="final-result" class="text-center mt-3"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-custom" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="footer_section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-lg-3 footer_col">
+          <div class="footer_contact">
+            <h4>Reach at..</h4>
+            <div class="contact_link_box">
+              <a href=""><i class="fa fa-map-marker" aria-hidden="true"></i><span>Location</span></a>
+              <a href=""><i class="fa fa-phone" aria-hidden="true"></i><span>Call +01 1234567890</span></a>
+              <a href=""><i class="fa fa-envelope" aria-hidden="true"></i><span>support@depressionhelp.com</span></a>
+            </div>
+          </div>
+          <div class="footer_social">
+            <a href=""><i class="fa fa-facebook" aria-hidden="true"></i></a>
+            <a href=""><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            <a href=""><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+            <a href=""><i class="fa fa-instagram" aria-hidden="true"></i></a>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 footer_col">
+          <div class="footer_detail">
+            <h4>About</h4>
+            <p>We provide accessible mental health resources, including depression tests and meditation, to help you achieve a balanced and peaceful life.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-2 mx-auto footer_col">
+          <div class="footer_link_box">
+            <h4>Links</h4>
+            <div class="footer_links">
+              <a href="index.html">Home</a>
+              <a href="about.html">About</a>
+              <a href="departments.html">Services</a>
+              <a href="doctors.html">Experts</a>
+              <a href="contact.html">Contact Us</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 footer_col">
+          <h4>Newsletter</h4>
+          <form action="#">
+            <input type="email" placeholder="Enter email" />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-info">
+        <p>
+          © <span id="displayYear"></span> All Rights Reserved By
+          <a href="https://html.design/">Free Html Templates</a><br><br>
+          © <span id="displayYear"></span> Distributed By
+          <a href="https://themewagon.com/">ThemeWagon</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- jQuery -->
+  <script type="text/javascript" src="../static/assetes/js/jquery-3.4.1.min.js"></script>
+  <!-- Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <!-- Bootstrap JS -->
+  <script type="text/javascript" src="../static/assetes/js/bootstrap.js"></script>
+  <!-- Owl Slider (optional) -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <!-- Custom JS -->
+  <script type="text/javascript" src="../static/assetes/js/custom.js"></script>
+
+  <script>
+    // Questions for the BDI
+    const bdiQuestions = [
+      "Sadness",
+      "Pessimism",
+      "Past Failure",
+      "Loss of Pleasure",
+      "Guilty Feelings",
+      // Add all 21 questions here
+    ];
+
+    // Questions for the HDRS
+    const hdrsQuestions = [
+      "Depressed Mood",
+      "Feelings of Guilt",
+      "Suicidal Thoughts",
+      "Insomnia (Early)",
+      "Work and Activities",
+      // Add all 17-21 questions here
+    ];
+
+    // Questions for the PHQ-9
+    const phq9Questions = [
+      "Little interest or pleasure in doing things",
+      "Feeling down, depressed, or hopeless",
+      "Trouble falling or staying asleep, or sleeping too much",
+      "Feeling tired or having little energy",
+      "Poor appetite or overeating",
+      "Feeling bad about yourself — or that you are a failure",
+      "Trouble concentrating on things",
+      "Moving or speaking slowly, or being fidgety",
+      "Thoughts that you would be better off dead",
+    ];
+
+    const answerOptions = [
+      { value: 0, text: "Not at all" },
+      { value: 1, text: "Sometimes" },
+      { value: 2, text: "Often" },
+      { value: 3, text: "Mostly Always" },
+    ];
+
+    const bdiAnswers = new Array(bdiQuestions.length).fill(0);
+    const hdrsAnswers = new Array(hdrsQuestions.length).fill(0);
+    const phq9Answers = new Array(phq9Questions.length).fill(0);
+
+    function renderBDIQuestions() {
+      const form = document.getElementById("bdi-form");
+      bdiQuestions.forEach((question, index) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <p>${question}</p>
+          <div class="options">
+            ${answerOptions.map(option => `
+              <label>
+                <input type="radio" name="bdi-question-${index}" value="${option.value}" onchange="handleBDIAnswer(${index}, ${option.value})" />
+                ${option.text}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        form.appendChild(questionDiv);
+      });
+    }
+
+    function renderHDRSQuestions() {
+      const form = document.getElementById("hdrs-form");
+      hdrsQuestions.forEach((question, index) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <p>${question}</p>
+          <div class="options">
+            ${answerOptions.map(option => `
+              <label>
+                <input type="radio" name="hdrs-question-${index}" value="${option.value}" onchange="handleHDRSAnswer(${index}, ${option.value})" />
+                ${option.text}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        form.appendChild(questionDiv);
+      });
+    }
+
+    function renderPHQ9Questions() {
+      const form = document.getElementById("phq9-form");
+      phq9Questions.forEach((question, index) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <p>${question}</p>
+          <div class="options">
+            ${answerOptions.map(option => `
+              <label>
+                <input type="radio" name="phq9-question-${index}" value="${option.value}" onchange="handlePHQ9Answer(${index}, ${option.value})" />
+                ${option.text}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        form.appendChild(questionDiv);
+      });
+    }
+
+    function handleBDIAnswer(index, value) { bdiAnswers[index] = value; }
+    function handleHDRSAnswer(index, value) { hdrsAnswers[index] = value; }
+    function handlePHQ9Answer(index, value) { phq9Answers[index] = value; }
+
+    function calculateScores() {
+      const bdiScore = bdiAnswers.reduce((total, score) => total + score, 0);
+      const hdrsScore = hdrsAnswers.reduce((total, score) => total + score, 0);
+      const phq9Score = phq9Answers.reduce((total, score) => total + score, 0);
+
+      const bdiSeverity = getBDISeverity(bdiScore);
+      const hdrsSeverity = getHDRSSeverity(hdrsScore);
+      const phq9Severity = getPHQ9Severity(phq9Score);
+
+      const averageScore = ((bdiScore + hdrsScore + phq9Score) / 3).toFixed(2);
+      const finalSeverity = getFinalSeverity(averageScore);
+
+      showResultsChart(bdiScore, hdrsScore, phq9Score, bdiSeverity, hdrsSeverity, phq9Severity, averageScore, finalSeverity);
+    }
+
+    function getBDISeverity(score) {
+      if (score <= 13) return "Minimal depression";
+      if (score <= 19) return "Mild depression";
+      if (score <= 28) return "Moderate depression";
+      return "Severe depression";
+    }
+
+    function getHDRSSeverity(score) {
+      if (score <= 7) return "Normal";
+      if (score <= 13) return "Mild depression";
+      if (score <= 18) return "Moderate depression";
+      if (score <= 22) return "Severe depression";
+      return "Very severe depression";
+    }
+
+    function getPHQ9Severity(score) {
+      if (score <= 4) return "Minimal depression";
+      if (score <= 9) return "Mild depression";
+      if (score <= 14) return "Moderate depression";
+      if (score <= 19) return "Moderately severe depression";
+      return "Severe depression";
+    }
+
+    function getFinalSeverity(averageScore) {
+      if (averageScore <= 7) return "Minimal depression";
+      if (averageScore <= 13) return "Mild depression";
+      if (averageScore <= 18) return "Moderate depression";
+      if (averageScore <= 22) return "Severe depression";
+      return "Very severe depression";
+    }
+
+    function showHDRS() {
+      document.getElementById("bdi-section").style.display = "none";
+      document.getElementById("hdrs-section").style.display = "block";
+      document.getElementById("phq9-section").style.display = "none";
+    }
+
+    function showBDI() {
+      document.getElementById("hdrs-section").style.display = "none";
+      document.getElementById("bdi-section").style.display = "block";
+      document.getElementById("phq9-section").style.display = "none";
+    }
+
+    function showPHQ9() {
+      document.getElementById("hdrs-section").style.display = "none";
+      document.getElementById("bdi-section").style.display = "none";
+      document.getElementById("phq9-section").style.display = "block";
+    }
+
+    function showResultsChart(bdiScore, hdrsScore, phq9Score, bdiSeverity, hdrsSeverity, phq9Severity, averageScore, finalSeverity) {
+      const ctx = document.getElementById("result-chart").getContext("2d");
+
+      if (window.resultChart) window.resultChart.destroy();
+
+      window.resultChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["BDI Score", "HDRS Score", "PHQ-9 Score"],
+          datasets: [{
+            label: "Score",
+            data: [bdiScore, hdrsScore, phq9Score],
+            backgroundColor: ["#f7444e", "#007bff", "#28a745"],
+            borderWidth: 1,
+          }],
+        },
+        options: {
+          scales: { y: { beginAtZero: true, max: 50 } },
+          plugins: { title: { display: true, text: `BDI: ${bdiSeverity} | HDRS: ${hdrsSeverity} | PHQ-9: ${phq9Severity}` } },
+        },
+      });
+
+      document.getElementById("final-result").innerHTML = `
+        <strong>Average Score:</strong> ${averageScore}<br>
+        <strong>Final Severity:</strong> ${finalSeverity}
+      `;
+
+      // Show the modal using Bootstrap's jQuery method
+      $('#resultModal').modal('show');
+    }
+
+    window.onload = () => {
+      renderBDIQuestions();
+      renderHDRSQuestions();
+      renderPHQ9Questions();
+    };
+  </script>
+</body>
+</html>
