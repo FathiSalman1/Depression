@@ -1,0 +1,64 @@
+<aside class="left-sidebar">
+    <div class="scroll-sidebar">
+        <nav class="sidebar-nav">
+            <ul id="sidebarnav">
+                <li class="nav-small-cap">
+                    <i class="mdi mdi-dots-horizontal"></i>
+                    <span class="hide-menu">Personal</span>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url_for('backend.dashboard') }}" aria-expanded="false">
+                        <i class="mdi mdi-av-timer"></i>
+                        <span class="hide-menu">Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">
+                        <i class="mdi mdi-account-plus"></i>
+                        <span class="hide-menu">Add</span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse first-level">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('backend.add_user') }}" class="sidebar-link">
+                                <i class="mdi mdi-adjust"></i>
+                                <span class="hide-menu">Users</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('backend.add_expert') }}" class="sidebar-link">
+                                <i class="mdi mdi-adjust"></i>
+                                <span class="hide-menu">Experts</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">
+                        <i class="mdi mdi-account-edit"></i>
+                        <span class="hide-menu">Edit</span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse first-level">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('backend.dashboard') }}" class="sidebar-link">
+                                <i class="mdi mdi-adjust"></i>
+                                <span class="hide-menu">Users</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('backend.expert_management') }}" class="sidebar-link">
+                                <i class="mdi mdi-adjust"></i>
+                                <span class="hide-menu">Experts</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url_for('backend.logout') }}" aria-expanded="false">
+                        <i class="mdi mdi-directions"></i>
+                        <span class="hide-menu">Log Out</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</aside>

@@ -28,7 +28,7 @@
   <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Custom styles for the assessment and navbar -->
+  <!-- Custom styles for the assessment, navbar, and print report -->
   <style>
     .assessment-container {
       background: #fff;
@@ -63,6 +63,7 @@
       border-radius: 5px;
       font-size: 16px;
       transition: background 0.3s ease;
+      margin: 5px;
     }
     .btn-custom:hover {
       background-color: #d9363e;
@@ -97,6 +98,72 @@
     }
     .navbar-toggler-icon {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); /* White hamburger icon */
+    }
+    /* Print-specific styles */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto', sans-serif;
+      }
+      .print-report {
+        width: 100%;
+        height: 100%;
+        padding: 20mm;
+        box-sizing: border-box;
+      }
+      .print-report h1 {
+        text-align: center;
+        color: #178066;
+        margin-bottom: 20px;
+      }
+      .print-report h2 {
+        color: #333;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+      .print-report p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 5px 0;
+      }
+      .print-report ul {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 10px 0 20px 20px;
+      }
+      .print-report img {
+        display: block;
+        margin: 20px auto;
+        max-width: 80%;
+        height: auto;
+      }
+      .print-report .footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 12px;
+        color: #666;
+      }
+      .print-report .disclaimer {
+        font-style: italic;
+        color: #666;
+        margin-top: 10px;
+      }
+    }
+    /* Tips section styling */
+    #tips-advice {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+    #tips-advice h4 {
+      color: #178066;
+      margin-bottom: 10px;
+    }
+    #tips-advice ul {
+      margin: 0;
+      padding-left: 20px;
     }
   </style>
 </head>
@@ -151,7 +218,7 @@
           <h3>Beck Depression Inventory (BDI)</h3>
           <form id="bdi-form"></form>
           <div class="navigation text-center">
-            <button class="btn-custom" onclick="showHDRS()">Next: HDRS</button>
+            <button class="btn-custom" onclick="validateAndShowHDRS()">Next: HDRS</button>
           </div>
         </div>
         <div id="hdrs-section" style="display: none;">
@@ -159,7 +226,7 @@
           <form id="hdrs-form"></form>
           <div class="navigation text-center">
             <button class="btn-custom" onclick="showBDI()">Previous: BDI</button>
-            <button class="btn-custom" onclick="showPHQ9()">Next: PHQ-9</button>
+            <button class="btn-custom" onclick="validateAndShowPHQ9()">Next: PHQ-9</button>
           </div>
         </div>
         <div id="phq9-section" style="display: none;">
@@ -167,7 +234,7 @@
           <form id="phq9-form"></form>
           <div class="navigation text-center">
             <button class="btn-custom" onclick="showHDRS()">Previous: HDRS</button>
-            <button class="btn-custom" data-toggle="modal" data-target="#resultModal" onclick="calculateScores()">Submit</button>
+            <button class="btn-custom" data-toggle="modal" data-target="#resultModal" onclick="validateAndCalculateScores()">Submit</button>
           </div>
         </div>
       </div>
@@ -176,7 +243,7 @@
 
   <!-- Modal for Results -->
   <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="resultModalLabel">Assessment Results</h5>
@@ -187,9 +254,31 @@
         <div class="modal-body">
           <canvas id="result-chart"></canvas>
           <p id="final-result" class="text-center mt-3"></p>
+          <div id="tips-advice"></div>
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn-custom" onclick="printReport()">Print Report</button>
           <button type="button" class="btn-custom" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Modal -->
+  <div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="validationModalLabel">Incomplete Section</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Please answer all questions in this section before proceeding.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-custom" data-dismiss="modal">OK</button>
         </div>
       </div>
     </div>
@@ -244,9 +333,9 @@
       <div class="footer-info">
         <p>
           © <span id="displayYear"></span> All Rights Reserved By
-          <a href="https://html.design/">Free Html Templates</a><br><br>
+          <a href="https://html.design/">Depression Test & Meditation</a><br><br>
           © <span id="displayYear"></span> Distributed By
-          <a href="https://themewagon.com/">ThemeWagon</a>
+          <a href="https://themewagon.com/">Depression Test & Meditation Team</a>
         </p>
       </div>
     </div>
@@ -264,27 +353,53 @@
   <script type="text/javascript" src="../static/assetes/js/custom.js"></script>
 
   <script>
-    // Questions for the BDI
+    // Questions for the BDI (21 questions)
     const bdiQuestions = [
       "Sadness",
       "Pessimism",
       "Past Failure",
       "Loss of Pleasure",
       "Guilty Feelings",
-      // Add all 21 questions here
+      "Punishment Feelings",
+      "Self-Dislike",
+      "Self-Criticalness",
+      "Suicidal Thoughts or Wishes",
+      "Crying",
+      "Agitation",
+      "Loss of Interest",
+      "Indecisiveness",
+      "Worthlessness",
+      "Loss of Energy",
+      "Changes in Sleeping Pattern",
+      "Irritability",
+      "Changes in Appetite",
+      "Concentration Difficulty",
+      "Tiredness or Fatigue",
+      "Loss of Interest in Sex"
     ];
 
-    // Questions for the HDRS
+    // Questions for the HDRS (17 questions)
     const hdrsQuestions = [
       "Depressed Mood",
       "Feelings of Guilt",
       "Suicidal Thoughts",
       "Insomnia (Early)",
+      "Insomnia (Middle)",
+      "Insomnia (Late)",
       "Work and Activities",
-      // Add all 17-21 questions here
+      "Retardation",
+      "Agitation",
+      "Psychic Anxiety",
+      "Somatic Anxiety",
+      "Somatic Symptoms (Gastrointestinal)",
+      "Somatic Symptoms (General)",
+      "Genital Symptoms",
+      "Hypochondriasis",
+      "Loss of Weight",
+      "Insight"
     ];
 
-    // Questions for the PHQ-9
+    // Questions for the PHQ-9 (9 questions)
     const phq9Questions = [
       "Little interest or pleasure in doing things",
       "Feeling down, depressed, or hopeless",
@@ -294,19 +409,23 @@
       "Feeling bad about yourself — or that you are a failure",
       "Trouble concentrating on things",
       "Moving or speaking slowly, or being fidgety",
-      "Thoughts that you would be better off dead",
+      "Thoughts that you would be better off dead"
     ];
 
     const answerOptions = [
       { value: 0, text: "Not at all" },
       { value: 1, text: "Sometimes" },
       { value: 2, text: "Often" },
-      { value: 3, text: "Mostly Always" },
+      { value: 3, text: "Mostly Always" }
     ];
 
-    const bdiAnswers = new Array(bdiQuestions.length).fill(0);
-    const hdrsAnswers = new Array(hdrsQuestions.length).fill(0);
-    const phq9Answers = new Array(phq9Questions.length).fill(0);
+    // Initialize answer arrays (null indicates unanswered)
+    const bdiAnswers = new Array(bdiQuestions.length).fill(null);
+    const hdrsAnswers = new Array(hdrsQuestions.length).fill(null);
+    const phq9Answers = new Array(phq9Questions.length).fill(null);
+
+    // Store results for printing
+    let latestResults = null;
 
     function renderBDIQuestions() {
       const form = document.getElementById("bdi-form");
@@ -314,7 +433,7 @@
         const questionDiv = document.createElement("div");
         questionDiv.className = "question";
         questionDiv.innerHTML = `
-          <p>${question}</p>
+          <p>${index + 1}. ${question}</p>
           <div class="options">
             ${answerOptions.map(option => `
               <label>
@@ -334,7 +453,7 @@
         const questionDiv = document.createElement("div");
         questionDiv.className = "question";
         questionDiv.innerHTML = `
-          <p>${question}</p>
+          <p>${index + 1}. ${question}</p>
           <div class="options">
             ${answerOptions.map(option => `
               <label>
@@ -354,7 +473,7 @@
         const questionDiv = document.createElement("div");
         questionDiv.className = "question";
         questionDiv.innerHTML = `
-          <p>${question}</p>
+          <p>${index + 1}. ${question}</p>
           <div class="options">
             ${answerOptions.map(option => `
               <label>
@@ -368,9 +487,120 @@
       });
     }
 
-    function handleBDIAnswer(index, value) { bdiAnswers[index] = value; }
-    function handleHDRSAnswer(index, value) { hdrsAnswers[index] = value; }
-    function handlePHQ9Answer(index, value) { phq9Answers[index] = value; }
+    function handleBDIAnswer(index, value) {
+      bdiAnswers[index] = value;
+    }
+
+    function handleHDRSAnswer(index, value) {
+      hdrsAnswers[index] = value;
+    }
+
+    function handlePHQ9Answer(index, value) {
+      phq9Answers[index] = value;
+    }
+
+    function validateSection(answers) {
+      const allAnswered = answers.every(answer => answer !== null);
+      if (!allAnswered) {
+        $('#validationModal').modal('show');
+      }
+      return allAnswered;
+    }
+
+    function validateAndShowHDRS() {
+      if (validateSection(bdiAnswers)) {
+        document.getElementById("bdi-section").style.display = "none";
+        document.getElementById("hdrs-section").style.display = "block";
+        document.getElementById("phq9-section").style.display = "none";
+      }
+    }
+
+    function showBDI() {
+      document.getElementById("hdrs-section").style.display = "none";
+      document.getElementById("bdi-section").style.display = "block";
+      document.getElementById("phq9-section").style.display = "none";
+    }
+
+    function validateAndShowPHQ9() {
+      if (validateSection(hdrsAnswers)) {
+        document.getElementById("hdrs-section").style.display = "none";
+        document.getElementById("bdi-section").style.display = "none";
+        document.getElementById("phq9-section").style.display = "block";
+      }
+    }
+
+    function showHDRS() {
+      document.getElementById("bdi-section").style.display = "none";
+      document.getElementById("hdrs-section").style.display = "block";
+      document.getElementById("phq9-section").style.display = "none";
+    }
+
+    function validateAndCalculateScores() {
+      if (validateSection(phq9Answers)) {
+        calculateScores();
+      }
+    }
+
+    function getTipsAndAdvice(severity) {
+      const tips = {
+        "Minimal depression": {
+          advice: "Your results suggest minimal depressive symptoms. Maintaining a healthy lifestyle can help prevent depression.",
+          tips: [
+            "Engage in regular physical activity (e.g., 30 minutes of exercise most days).",
+            "Practice mindfulness or meditation to reduce stress.",
+            "Maintain a balanced diet rich in fruits, vegetables, and omega-3 fatty acids.",
+            "Stay connected with friends and family for social support.",
+            "Ensure 7-9 hours of quality sleep nightly."
+          ],
+          medication: "No medication is typically required. Focus on lifestyle changes and self-care."
+        },
+        "Mild depression": {
+          advice: "Mild depressive symptoms may benefit from lifestyle changes and professional support.",
+          tips: [
+            "Consider cognitive-behavioral therapy (CBT) with a licensed therapist.",
+            "Practice stress-reduction techniques like yoga or deep breathing.",
+            "Establish a daily routine to provide structure and stability.",
+            "Engage in hobbies or activities you enjoy to boost mood.",
+            "Limit alcohol and avoid recreational drugs."
+          ],
+          medication: "Medication is usually not required, but low-dose antidepressants (e.g., SSRIs like sertraline) may be considered under medical supervision."
+        },
+        "Moderate depression": {
+          advice: "Moderate depression often requires a combination of therapy and possibly medication.",
+          tips: [
+            "Seek psychotherapy, such as CBT or interpersonal therapy (IPT).",
+            "Join a support group to share experiences and reduce isolation.",
+            "Practice self-compassion and avoid negative self-talk.",
+            "Set small, achievable goals to build confidence.",
+            "Monitor symptoms and communicate regularly with a healthcare provider."
+          ],
+          medication: "Antidepressants like SSRIs (e.g., fluoxetine, escitalopram) or SNRIs (e.g., venlafaxine) are commonly prescribed. Consult a psychiatrist."
+        },
+        "Severe depression": {
+          advice: "Severe depression requires immediate professional intervention.",
+          tips: [
+            "Contact a mental health professional or psychiatrist promptly.",
+            "Consider intensive therapy, such as CBT or dialectical behavior therapy (DBT).",
+            "Ensure a strong support network of family, friends, or professionals.",
+            "Avoid major life decisions until symptoms stabilize.",
+            "Follow a structured treatment plan, including regular check-ins."
+          ],
+          medication: "Antidepressants (e.g., SSRIs, SNRIs, or tricyclics like amitriptyline) are often prescribed, sometimes with adjunctive therapies. Hospitalization may be considered."
+        },
+        "Very severe depression": {
+          advice: "Very severe depression is a medical emergency requiring urgent care.",
+          tips: [
+            "Seek immediate help from a psychiatrist or emergency services.",
+            "Consider inpatient treatment for safety and intensive care.",
+            "Adhere strictly to prescribed treatment plans.",
+            "Involve trusted individuals in your care plan for support.",
+            "Avoid isolation and maintain contact with professionals."
+          ],
+          medication: "Combination therapy (e.g., SSRIs/SNRIs with antipsychotics like aripiprazole) or electroconvulsive therapy (ECT) may be recommended. Urgent psychiatric evaluation is essential."
+        }
+      };
+      return tips[severity] || tips["Minimal depression"];
+    }
 
     function calculateScores() {
       const bdiScore = bdiAnswers.reduce((total, score) => total + score, 0);
@@ -383,6 +613,18 @@
 
       const averageScore = ((bdiScore + hdrsScore + phq9Score) / 3).toFixed(2);
       const finalSeverity = getFinalSeverity(averageScore);
+
+      latestResults = {
+        bdiScore,
+        hdrsScore,
+        phq9Score,
+        bdiSeverity,
+        hdrsSeverity,
+        phq9Severity,
+        averageScore,
+        finalSeverity,
+        tipsAdvice: getTipsAndAdvice(finalSeverity)
+      };
 
       showResultsChart(bdiScore, hdrsScore, phq9Score, bdiSeverity, hdrsSeverity, phq9Severity, averageScore, finalSeverity);
     }
@@ -418,24 +660,6 @@
       return "Very severe depression";
     }
 
-    function showHDRS() {
-      document.getElementById("bdi-section").style.display = "none";
-      document.getElementById("hdrs-section").style.display = "block";
-      document.getElementById("phq9-section").style.display = "none";
-    }
-
-    function showBDI() {
-      document.getElementById("hdrs-section").style.display = "none";
-      document.getElementById("bdi-section").style.display = "block";
-      document.getElementById("phq9-section").style.display = "none";
-    }
-
-    function showPHQ9() {
-      document.getElementById("hdrs-section").style.display = "none";
-      document.getElementById("bdi-section").style.display = "none";
-      document.getElementById("phq9-section").style.display = "block";
-    }
-
     function showResultsChart(bdiScore, hdrsScore, phq9Score, bdiSeverity, hdrsSeverity, phq9Severity, averageScore, finalSeverity) {
       const ctx = document.getElementById("result-chart").getContext("2d");
 
@@ -449,13 +673,13 @@
             label: "Score",
             data: [bdiScore, hdrsScore, phq9Score],
             backgroundColor: ["#f7444e", "#007bff", "#28a745"],
-            borderWidth: 1,
-          }],
+            borderWidth: 1
+          }]
         },
         options: {
           scales: { y: { beginAtZero: true, max: 50 } },
-          plugins: { title: { display: true, text: `BDI: ${bdiSeverity} | HDRS: ${hdrsSeverity} | PHQ-9: ${phq9Severity}` } },
-        },
+          plugins: { title: { display: true, text: `BDI: ${bdiSeverity} | HDRS: ${hdrsSeverity} | PHQ-9: ${phq9Severity}` } }
+        }
       });
 
       document.getElementById("final-result").innerHTML = `
@@ -463,8 +687,129 @@
         <strong>Final Severity:</strong> ${finalSeverity}
       `;
 
+      const tipsAdvice = getTipsAndAdvice(finalSeverity);
+      document.getElementById("tips-advice").innerHTML = `
+        <h4>Tips and Advice for Managing Depression</h4>
+        <p>${tipsAdvice.advice}</p>
+        <ul>
+          ${tipsAdvice.tips.map(tip => `<li>${tip}</li>`).join("")}
+        </ul>
+        <p><strong>Recommended Treatment:</strong> ${tipsAdvice.medication}</p>
+        <p class="disclaimer"><em>Disclaimer: Always consult a healthcare professional before starting any treatment. This tool is not a substitute for medical advice.</em></p>
+      `;
+
       // Show the modal using Bootstrap's jQuery method
       $('#resultModal').modal('show');
+    }
+
+    function printReport() {
+      if (!latestResults || !window.resultChart) return;
+
+      // Get the chart as a base64 image
+      const chartImage = window.resultChart.toBase64Image();
+
+      // Create the printable HTML content
+      const printContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Depression Assessment Report</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: 'Roboto', sans-serif;
+            }
+            .print-report {
+              width: 100%;
+              height: 100%;
+              padding: 20mm;
+              box-sizing: border-box;
+            }
+            .print-report h1 {
+              text-align: center;
+              color: #178066;
+              margin-bottom: 20px;
+            }
+            .print-report h2 {
+              color: #333;
+              margin-top: 20px;
+              margin-bottom: 10px;
+            }
+            .print-report p {
+              font-size: 16px;
+              line-height: 1.5;
+              margin: 5px 0;
+            }
+            .print-report ul {
+              font-size: 16px;
+              line-height: 1.5;
+              margin: 10px 0 20px 20px;
+            }
+            .print-report img {
+              display: block;
+              margin: 20px auto;
+              max-width: 80%;
+              height: auto;
+            }
+            .print-report .footer {
+              text-align: center;
+              margin-top: 30px;
+              font-size: 12px;
+              color: #666;
+            }
+            .print-report .disclaimer {
+              font-style: italic;
+              color: #666;
+              margin-top: 10px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-report">
+            <h1>Depression Assessment Report</h1>
+            <h2>Assessment Results</h2>
+            <p><strong>Beck Depression Inventory (BDI) Score:</strong> ${latestResults.bdiScore}</p>
+            <p><strong>BDI Severity:</strong> ${latestResults.bdiSeverity}</p>
+            <p><strong>Hamilton Depression Rating Scale (HDRS) Score:</strong> ${latestResults.hdrsScore}</p>
+            <p><strong>HDRS Severity:</strong> ${latestResults.hdrsSeverity}</p>
+            <p><strong>Patient Health Questionnaire-9 (PHQ-9) Score:</strong> ${latestResults.phq9Score}</p>
+            <p><strong>PHQ-9 Severity:</strong> ${latestResults.phq9Severity}</p>
+            <p><strong>Average Score:</strong> ${latestResults.averageScore}</p>
+            <p><strong>Final Severity:</strong> ${latestResults.finalSeverity}</p>
+            <h2>Score Comparison</h2>
+            <img src="${chartImage}" alt="Assessment Scores Chart" />
+            <h2>Tips and Advice for Managing Depression</h2>
+            <p>${latestResults.tipsAdvice.advice}</p>
+            <ul>
+              ${latestResults.tipsAdvice.tips.map(tip => `<li>${tip}</li>`).join("")}
+            </ul>
+            <p><strong>Recommended Treatment:</strong> ${latestResults.tipsAdvice.medication}</p>
+            <p class="disclaimer"><em>Disclaimer: Always consult a healthcare professional before starting any treatment. This tool is not a substitute for medical advice.</em></p>
+            <p class="footer">
+              Generated by Depression Test & Meditation<br>
+              Date: ${new Date().toLocaleDateString()}<br>
+              © ${new Date().getFullYear()} All Rights Reserved
+            </p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Open a new window and write the print content
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+
+      // Trigger the print dialog after the content is loaded
+      printWindow.onload = function() {
+        printWindow.print();
+        // Close the window after printing (optional, comment out if not desired)
+        printWindow.onafterprint = function() {
+          printWindow.close();
+        };
+      };
     }
 
     window.onload = () => {
