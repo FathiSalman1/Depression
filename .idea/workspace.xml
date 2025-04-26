@@ -4,25 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89ff49ae-8548-4fa9-89af-0bf4e0d7d2a1" name="Changes" comment="add ai second module&#10;add landing page&#10;add sprat routes&#10;add front and backend files&#10;add conrel panal">
-      <change afterPath="$PROJECT_DIR$/admins.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/admins.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/templates/add-user.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/templates/edit-profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/templates/edit-user.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/templates/header.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/templates/sidebar.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/users.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experts.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/users.db" afterDir="false" />
+    <list default="true" id="89ff49ae-8548-4fa9-89af-0bf4e0d7d2a1" name="Changes" comment="complate dash board&#10;user board">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/db.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/templates/add-expert.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/templates/add-expert.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admins.db" beforeDir="false" afterPath="$PROJECT_DIR$/admins.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/templates/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/templates/test.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/templates/test.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users.db" beforeDir="false" afterPath="$PROJECT_DIR$/users.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,32 +65,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Flask server.flaskProject.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "com.codeium.enabled": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/HP/PycharmProjects/flaskProject/backend",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Flask server.flaskProject.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;com.codeium.enabled&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP/PycharmProjects/flaskProject/backend&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mariadb",
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mariadb&quot;,
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\HP\PycharmProjects\flaskProject\backend" />
@@ -176,7 +162,9 @@
       <workItem from="1742247546434" duration="8738000" />
       <workItem from="1744478455549" duration="2934000" />
       <workItem from="1744528048823" duration="5905000" />
-      <workItem from="1745183585876" duration="10358000" />
+      <workItem from="1745183585876" duration="11215000" />
+      <workItem from="1745396210680" duration="47000" />
+      <workItem from="1745678286666" duration="2606000" />
     </task>
     <task id="LOCAL-00001" summary="all updates">
       <option name="closed" value="true" />
@@ -218,7 +206,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742256738284</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="complate dash board&#10;user board">
+      <option name="closed" value="true" />
+      <created>1745194265378</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1745194265378</updated>
+    </task>
+    <task id="LOCAL-00007" summary="complate dash board&#10;user board">
+      <option name="closed" value="true" />
+      <created>1745194279731</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1745194279731</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -241,9 +245,10 @@
     <MESSAGE value="Add Test" />
     <MESSAGE value="Edit the numbers&#10;Add login page&#10;Add requirements for database configuration" />
     <MESSAGE value="add ai second module&#10;add landing page&#10;add sprat routes&#10;add front and backend files&#10;add conrel panal" />
-    <option name="LAST_COMMIT_MESSAGE" value="add ai second module&#10;add landing page&#10;add sprat routes&#10;add front and backend files&#10;add conrel panal" />
+    <MESSAGE value="complate dash board&#10;user board" />
+    <option name="LAST_COMMIT_MESSAGE" value="complate dash board&#10;user board" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/flaskProject$flaskProject.coverage" NAME="flaskProject Coverage Results" MODIFIED="1745193713759" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/flaskProject$flaskProject.coverage" NAME="flaskProject Coverage Results" MODIFIED="1745680896726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

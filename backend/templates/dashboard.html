@@ -7,17 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Admin dashboard for Depression Test & Meditation platform">
     <meta name="author" content="">
-    <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">
     <title>Admin Dashboard</title>
-    <!-- Custom CSS -->
     <link href="../static/assets/libs/chartist/dist/chartist.min.css" rel="stylesheet">
     <link href="../static/assets/extra-libs/c3/c3.min.css" rel="stylesheet">
     <link href="../static/assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css" rel="stylesheet" />
     <link href="../static/dist/css/style.min.css" rel="stylesheet">
-    <!-- SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
@@ -26,7 +22,6 @@
 
 <body>
     <div id="main-wrapper">
-        <!-- Topbar header -->
         <header class="topbar">
             <nav class="navbar top-navbar navbar-expand-md navbar-dark">
                 <div class="navbar-header">
@@ -96,7 +91,6 @@
                                                     <span class="time">9:30 AM</span>
                                                 </div>
                                             </a>
-                                            <!-- Add more messages as needed -->
                                         </div>
                                     </li>
                                     <li>
@@ -136,7 +130,6 @@
                                                     <span class="time">9:30 AM</span>
                                                 </div>
                                             </a>
-                                            <!-- Add more notifications as needed -->
                                         </div>
                                     </li>
                                     <li>
@@ -199,7 +192,6 @@
                 </div>
             </nav>
         </header>
-        <!-- Left Sidebar -->
         <aside class="left-sidebar">
             <div class="scroll-sidebar">
                 <nav class="sidebar-nav">
@@ -221,12 +213,11 @@
                             </a>
                             <ul aria-expanded="false" class="collapse first-level">
                                 <li class="sidebar-item">
-                                    <a href="{{ url_for('backend.add_user') }}" class="sidebar-link">
+                                    <a href="javascript:void(0)" class="sidebar-link" data-toggle="modal" data-target="#addUserModal">
                                         <i class="mdi mdi-adjust"></i>
                                         <span class="hide-menu">Users</span>
                                     </a>
                                 </li>
-
                             </ul>
                         </li>
                         <li class="sidebar-item">
@@ -241,7 +232,6 @@
                                         <span class="hide-menu">Users</span>
                                     </a>
                                 </li>
-
                             </ul>
                         </li>
                         <li class="sidebar-item">
@@ -254,9 +244,7 @@
                 </nav>
             </div>
         </aside>
-        <!-- Page wrapper -->
         <div class="page-wrapper">
-            <!-- Breadcrumb -->
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
@@ -276,9 +264,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Container fluid -->
             <div class="container-fluid">
-                <!-- Flash messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
@@ -291,7 +277,6 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <!-- Statistics cards -->
                 <div class="card-group">
                     <div class="card">
                         <div class="card-body">
@@ -382,11 +367,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- User Management Section -->
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">User Management</h4>
-                        <a href="{{ url_for('backend.add_user') }}" class="btn btn-primary mb-3">Add New User</a>
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addUserModal">Add New User</button>
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
@@ -420,15 +404,45 @@
                         </div>
                     </div>
                 </div>
-
+                <!-- Add User Modal -->
+                <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addUserForm" action="{{ url_for('backend.add_user') }}" method="POST">
+                                    <div class="form-group">
+                                        <label for="userName">Name</label>
+                                        <input type="text" class="form-control" id="userName" name="name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="userEmail">Email</label>
+                                        <input type="email" class="form-control" id="userEmail" name="email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="userPassword">Password</label>
+                                        <input type="password" class="form-control" id="userPassword" name="password" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" form="addUserForm" class="btn btn-primary">Add User</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Footer -->
             <footer class="footer text-center">
                 All Rights Reserved. Designed and Developed by xAI.
             </footer>
         </div>
     </div>
-    <!-- Scripts -->
     <script src="../static/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../static/assets/libs/popper.js/dist/umd/popper.min.js"></script>
     <script src="../static/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -447,8 +461,38 @@
     <script src="../static/assets/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="../static/assets/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
     <script src="../static/dist/js/pages/dashboards/dashboard1.js"></script>
-    <!-- SweetAlert JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            $('#addUserForm').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#addUserModal').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'User added successfully!',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to add user. Please try again.',
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
