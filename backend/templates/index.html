@@ -720,7 +720,11 @@
             loginPasswordError.style.display = 'block';
           }
         } else {
-          loginPasswordError.textContent = data.message || 'Incorrect email or password.';
+          if (data.message.includes('database is locked')) {
+            loginPasswordError.textContent = 'Server is busy. Please try again later.';
+          } else {
+            loginPasswordError.textContent = data.message || 'Incorrect email or password.';
+          }
           loginPasswordError.style.display = 'block';
         }
       } catch (error) {
@@ -776,7 +780,11 @@
             emailError.style.display = 'block';
           }
         } else {
-          emailError.textContent = data.message || 'Email already registered.';
+          if (data.message.includes('database is locked')) {
+            emailError.textContent = 'Server is busy. Please try again later.';
+          } else {
+            emailError.textContent = data.message || 'Email already registered.';
+          }
           emailError.style.display = 'block';
         }
       } catch (error) {
@@ -807,7 +815,11 @@
           document.getElementById('profileName').textContent = data.name || 'N/A';
           document.getElementById('profileEmail').textContent = data.email;
         } else {
-          alert(data.message || 'Failed to load profile. Please log in again.');
+          if (data.message.includes('database is locked')) {
+            alert('Server is busy. Please try again later.');
+          } else {
+            alert(data.message || 'Failed to load profile. Please log in again.');
+          }
           localStorage.removeItem('jwtToken');
           updateNavbar();
           $('#profileModal').modal('hide');
@@ -823,7 +835,7 @@
       localStorage.removeItem('jwtToken');
       $('#profileModal').modal('hide');
       updateNavbar();
-      // Optional: Notify server of logout (if using token blacklist)
+      // Optional: Notify server of logout
       fetch('/api/logout', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` }
