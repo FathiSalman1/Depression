@@ -107,21 +107,6 @@
       font-size: 16px;
       margin: 10px 0;
     }
-    .test-history {
-      margin-top: 20px;
-    }
-    .test-history h6 {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .test-history ul {
-      list-style: none;
-      padding: 0;
-    }
-    .test-history li {
-      padding: 5px 0;
-      border-bottom: 1px solid #eee;
-    }
   </style>
 </head>
 <body>
@@ -142,12 +127,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav auth-buttons">
-              <li class="nav-item" id="login-nav">
-                <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Login</a>
-              </li>
-              <li class="nav-item" id="register-nav">
-                <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
-              </li>
+
               <li class="nav-item profile-button" id="profile-nav" style="display: none;">
                 <a class="nav-link" href="#" data-toggle="modal" data-target="#profileModal"><i class="fa fa-user" aria-hidden="true"></i> Profile</a>
               </li>
@@ -593,10 +573,7 @@
           <div class="profile-details">
             <p><strong>Name:</strong> <span id="profileName"></span></p>
             <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-            <div class="test-history">
-              <h6>Test History</h6>
-              <ul id="testHistoryList"></ul>
-            </div>
+            <p><strong>Test History:</strong> No test results available.</p>
           </div>
           <button class="btn-custom" onclick="logout()">Logout</button>
         </div>
@@ -683,10 +660,15 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap"></script>
 
   <script>
+    // Validate JWT token format
+    function isValidToken(token) {
+      return token && /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(token);
+    }
+
     // Update navbar based on login status
     function updateNavbar() {
       const token = localStorage.getItem('jwtToken');
-      if (token) {
+      if (token && isValidToken(token)) {
         document.getElementById('login-nav').style.display = 'none';
         document.getElementById('register-nav').style.display = 'none';
         document.getElementById('profile-nav').style.display = 'block';
@@ -694,6 +676,7 @@
         document.getElementById('login-nav').style.display = 'block';
         document.getElementById('register-nav').style.display = 'block';
         document.getElementById('profile-nav').style.display = 'none';
+        localStorage.removeItem('jwtToken'); // Clear invalid token
       }
     }
 
@@ -722,22 +705,25 @@
         const data = await response.json();
 
         if (response.ok) {
-          localStorage.setItem('jwtToken', data.token);
-          $('#loginModal').modal('hide');
-          updateNavbar();
-          document.getElementById('loginForm').reset();
+          if (isValidToken(data.token)) {
+            localStorage.setItem('jwtToken', data.token);
+            $('#loginModal').modal('hide');
+            updateNavbar();
+            document.getElementById('loginForm').reset();
+          } else {
+            loginPasswordError.textContent = 'Invalid token received from server.';
+            loginPasswordError.style.display = 'block';
+          }
         } else {
-          if (response.status === 503) {
+          if (data.message.includes('database is locked')) {
             loginPasswordError.textContent = 'Server is busy. Please try again later.';
-          } else if (response.status === 429) {
-            loginPasswordError.textContent = 'Too many login attempts. Please wait a moment and try again.';
           } else {
             loginPasswordError.textContent = data.message || 'Incorrect email or password.';
           }
           loginPasswordError.style.display = 'block';
         }
       } catch (error) {
-        loginPasswordError.textContent = 'Network error. Please check your connection and try again.';
+        loginPasswordError.textContent = 'Server error. Please try again later.';
         loginPasswordError.style.display = 'block';
       }
     });
@@ -779,22 +765,25 @@
         const data = await response.json();
 
         if (response.ok) {
-          localStorage.setItem('jwtToken', data.token);
-          $('#registerModal').modal('hide');
-          updateNavbar();
-          document.getElementById('registerForm').reset();
+          if (isValidToken(data.token)) {
+            localStorage.setItem('jwtToken', data.token);
+            $('#registerModal').modal('hide');
+            updateNavbar();
+            document.getElementById('registerForm').reset();
+          } else {
+            emailError.textContent = 'Invalid token received from server.';
+            emailError.style.display = 'block';
+          }
         } else {
-          if (response.status === 503) {
+          if (data.message.includes('database is locked')) {
             emailError.textContent = 'Server is busy. Please try again later.';
-          } else if (response.status === 429) {
-            emailError.textContent = 'Too many registration attempts. Please wait a moment and try again.';
           } else {
             emailError.textContent = data.message || 'Email already registered.';
           }
           emailError.style.display = 'block';
         }
       } catch (error) {
-        emailError.textContent = 'Network error. Please check your connection and try again.';
+        emailError.textContent = 'Server error. Please try again later.';
         emailError.style.display = 'block';
       }
     });
@@ -802,9 +791,10 @@
     // Populate profile modal
     $('#profileModal').on('show.bs.modal', async function() {
       const token = localStorage.getItem('jwtToken');
-      if (!token) {
+      if (!token || !isValidToken(token)) {
         $('#profileModal').modal('hide');
-        alert('Please log in to view your profile.');
+        alert('Invalid or missing session. Please log in again.');
+        localStorage.removeItem('jwtToken');
         updateNavbar();
         return;
       }
@@ -819,51 +809,32 @@
         if (response.ok) {
           document.getElementById('profileName').textContent = data.name || 'N/A';
           document.getElementById('profileEmail').textContent = data.email;
-          const testHistoryList = document.getElementById('testHistoryList');
-          testHistoryList.innerHTML = '';
-          if (data.test_history && data.test_history.length > 0) {
-            data.test_history.forEach(test => {
-              const li = document.createElement('li');
-              li.textContent = `Date: ${test.test_date}, Score: ${test.score}, Result: ${test.result}`;
-              testHistoryList.appendChild(li);
-            });
-          } else {
-            const li = document.createElement('li');
-            li.textContent = 'No test results available.';
-            testHistoryList.appendChild(li);
-          }
         } else {
-          if (response.status === 503) {
+          if (data.message.includes('database is locked')) {
             alert('Server is busy. Please try again later.');
-          } else if (response.status === 401) {
-            alert('Session expired. Please log in again.');
-            localStorage.removeItem('jwtToken');
-            updateNavbar();
           } else {
-            alert(data.message || 'Failed to load profile. Please try again.');
+            alert(data.message || 'Failed to load profile. Please log in again.');
           }
+          localStorage.removeItem('jwtToken');
+          updateNavbar();
           $('#profileModal').modal('hide');
         }
       } catch (error) {
-        alert('Network error. Please check your connection and try again.');
+        alert('Server error. Please try again later.');
         $('#profileModal').modal('hide');
       }
     });
 
     // Handle logout
-    async function logout() {
-      const token = localStorage.getItem('jwtToken');
-      try {
-        await fetch('/api/logout', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-      } catch (error) {
-        console.error('Logout error:', error);
-      }
+    function logout() {
       localStorage.removeItem('jwtToken');
       $('#profileModal').modal('hide');
       updateNavbar();
+      // Optional: Notify server of logout
+      fetch('/api/logout', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` }
+      }).catch(error => console.error('Logout error:', error));
     }
 
     // Initialize navbar on page load

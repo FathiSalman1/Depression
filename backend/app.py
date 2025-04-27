@@ -10,9 +10,6 @@ import logging
 import json
 from werkzeug.utils import secure_filename
 import time
-from threading import Lock
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -20,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize the Flask application
 app = Flask(__name__)
-app.secret_key = os.urandom(24).hex()
+app.secret_key = 'your-secret-key'  # Replace with a secure key in production
 app.config['SECRET_KEY'] = app.secret_key
 app.config['UPLOAD_FOLDER'] = os.path.abspath('static/uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
@@ -32,36 +29,6 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Enable CORS for API routes
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# Rate limiter
-limiter = Limiter(app, key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
-
-# Database locks
-user_db_lock = Lock()
-admin_db_lock = Lock()
-expert_db_lock = Lock()
-
-# Database connection helpers
-def get_user_db_connection():
-    conn = sqlite3.connect('users.db')
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL;')
-    conn.execute('PRAGMA busy_timeout=5000;')
-    return conn
-
-def get_admin_db_connection():
-    conn = sqlite3.connect('admins.db')
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL;')
-    conn.execute('PRAGMA busy_timeout=5000;')
-    return conn
-
-def get_expert_db_connection():
-    conn = sqlite3.connect('experts.db')
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL;')
-    conn.execute('PRAGMA busy_timeout=5000;')
-    return conn
-
 # Database initialization
 def init_db():
     def column_exists(cursor, table_name, column_name):
@@ -70,86 +37,85 @@ def init_db():
         return column_name in columns
 
     # Initialize users.db
-    with sqlite3.connect('users.db') as conn:
-        conn.execute('PRAGMA journal_mode=WAL;')
-        conn.execute('PRAGMA busy_timeout=5000;')
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                test_history TEXT DEFAULT '[]',
-                last_active TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        if not column_exists(cursor, 'users', 'last_active'):
-            cursor.execute('ALTER TABLE users ADD COLUMN last_active TIMESTAMP')
-        hashed_password_user1 = generate_password_hash('password123', method='pbkdf2:sha256')
-        try:
-            cursor.execute('INSERT INTO users (name, email, password, last_active) VALUES (?, ?, ?, ?)',
-                           ('John Doe', 'john@example.com', hashed_password_user1, datetime.datetime.utcnow()))
-        except sqlite3.IntegrityError:
-            logger.warning("User 'john@example.com' already exists")
-        hashed_password_user2 = generate_password_hash('test456', method='pbkdf2:sha256')
-        sample_test_history = '[{"test_date": "2025-04-20", "score": 15, "result": "Moderate depression"}]'
-        try:
-            cursor.execute('INSERT INTO users (name, email, password, test_history, last_active) VALUES (?, ?, ?, ?, ?)',
-                           ('Jane Smith', 'jane@example.com', hashed_password_user2, sample_test_history, datetime.datetime.utcnow()))
-        except sqlite3.IntegrityError:
-            logger.warning("User 'jane@example.com' already exists")
-        conn.commit()
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            test_history TEXT DEFAULT '[]',
+            last_active TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    if not column_exists(cursor, 'users', 'last_active'):
+        cursor.execute('ALTER TABLE users ADDCOLUMN last_active TIMESTAMP')
+    hashed_password_user1 = generate_password_hash('password123', method='pbkdf2:sha256')
+    try:
+        cursor.execute('INSERT INTO users (name, email, password, last_active) VALUES (?, ?, ?, ?)',
+                       ('John Doe', 'john@example.com', hashed_password_user1, datetime.datetime.utcnow()))
+    except sqlite3.IntegrityError:
+        logger.warning("User 'john@example.com' already exists")
+    hashed_password_user2 = generate_password_hash('test456', method='pbkdf2:sha256')
+    sample_test_history = '[{"test_date": "2025-04-20", "score": 15, "result": "Moderate depression"}]'
+    try:
+        cursor.execute('INSERT INTO users (name, email, password, test_history, last_active) VALUES (?, ?, ?, ?, ?)',
+                       ('Jane Smith', 'jane@example.com', hashed_password_user2, sample_test_history, datetime.datetime.utcnow()))
+    except sqlite3.IntegrityError:
+        logger.warning("User 'jane@example.com' already exists")
+    conn.commit()
+    conn.close()
 
     # Initialize admins.db
-    with sqlite3.connect('admins.db') as conn:
-        conn.execute('PRAGMA journal_mode=WAL;')
-        conn.execute('PRAGMA busy_timeout=5000;')
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS admins (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                username TEXT UNIQUE NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                profile_image TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        if not column_exists(cursor, 'admins', 'profile_image'):
-            cursor.execute('ALTER TABLE admins ADD COLUMN profile_image TEXT')
-        hashed_password_admin = generate_password_hash('admin123', method='pbkdf2:sha256')
-        try:
-            cursor.execute('INSERT INTO admins (username, password, email, name) VALUES (?, ?, ?, ?)',
-                           ('admin', hashed_password_admin, 'admin@gmail.com', 'Administrator'))
-        except sqlite3.IntegrityError:
-            logger.warning("Admin 'admin' already exists")
-        hashed_password_admin2 = generate_password_hash('manager456', method='pbkdf2:sha256')
-        try:
-            cursor.execute('INSERT INTO admins (username, password, email, name) VALUES (?, ?, ?, ?)',
-                           ('manager', hashed_password_admin2, 'manager@gmail.com', 'Manager'))
-        except sqlite3.IntegrityError:
-            logger.warning("Admin 'manager' already exists")
-        conn.commit()
+    conn = sqlite3.connect('admins.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS admins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            profile_image TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    if not column_exists(cursor, 'admins', 'profile_image'):
+        cursor.execute('ALTER TABLE admins ADD COLUMN profile_image TEXT')
+    hashed_password_admin = generate_password_hash('admin123', method='pbkdf2:sha256')
+    try:
+        cursor.execute('INSERT INTO admins (username, password, email, name) VALUES (?, ?, ?, ?)',
+                       ('admin', hashed_password_admin, 'admin@gmail.com', 'Administrator'))
+    except sqlite3.IntegrityError:
+        logger.warning("Admin 'admin' already exists")
+    hashed_password_admin2 = generate_password_hash('manager456', method='pbkdf2:sha256')
+    try:
+        cursor.execute('INSERT INTO admins (username, password, email, name) VALUES (?, ?, ?, ?)',
+                       ('manager', hashed_password_admin2, 'manager@gmail.com', 'Manager'))
+    except sqlite3.IntegrityError:
+        logger.warning("Admin 'manager' already exists")
+    conn.commit()
+    conn.close()
 
-    # Initialize experts.db
-    with sqlite3.connect('experts.db') as conn:
-        conn.execute('PRAGMA journal_mode=WAL;')
-        conn.execute('PRAGMA busy_timeout=5000;')
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS experts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                specialization TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        conn.commit()
+
+
+# Database connection helpers
+def get_user_db_connection():
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_admin_db_connection():
+    conn = sqlite3.connect('admins.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_expert_db_connection():
+    conn = sqlite3.connect('experts.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # Helper function for file extensions
 def allowed_file(filename):
@@ -165,28 +131,22 @@ def token_required(f):
         try:
             token = token.split(" ")[1]
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            with get_user_db_connection() as conn:
-                c = conn.cursor()
-                c.execute('SELECT * FROM users WHERE email = ?', (data['email'],))
-                current_user = c.fetchone()
-                if current_user:
-                    c.execute('UPDATE users SET last_active = ? WHERE email = ?',
-                             (datetime.datetime.utcnow(), data['email']))
-                    conn.commit()
-                if not current_user:
-                    return jsonify({'message': 'User not found'}), 401
-        except jwt.ExpiredSignatureError:
-            logger.error("Token has expired")
-            return jsonify({'message': 'Token has expired'}), 401
-        except jwt.InvalidTokenError as e:
-            logger.error(f"Invalid token: {e}")
-            return jsonify({'message': 'Token is invalid'}), 401
-        except sqlite3.OperationalError as e:
-            logger.error(f"Database operational error during token validation: {e}")
-            return jsonify({'message': 'Database is temporarily unavailable. Please try again.'}), 503
+            conn = get_user_db_connection()
+            c = conn.cursor()
+            c.execute('SELECT * FROM users WHERE email = ?', (data['email'],))
+            current_user = c.fetchone()
+            if current_user:
+                c.execute('UPDATE users SET last_active = ? WHERE email = ?',
+                         (datetime.datetime.utcnow(), data['email']))
+                conn.commit()
+            conn.close()
+            if not current_user:
+                return jsonify({'message': 'User not found'}), 401
         except sqlite3.Error as e:
-            logger.error(f"Database error during token validation: {e}")
             return jsonify({'message': f'Database error: {str(e)}'}), 500
+        except Exception as e:
+            logger.error(f"Token validation error: {e}")
+            return jsonify({'message': 'Token is invalid'}), 401
         return f(current_user, *args, **kwargs)
     return decorated
 
@@ -194,7 +154,6 @@ def token_required(f):
 api_bp = Blueprint('api', __name__)
 
 @api_bp.route('/register', methods=['POST'])
-@limiter.limit("5 per minute")
 def register():
     data = request.get_json()
     name = data.get('name')
@@ -205,13 +164,13 @@ def register():
     if len(password) < 6:
         return jsonify({'message': 'Password must be at least 6 characters'}), 400
     try:
-        with user_db_lock:
-            with get_user_db_connection() as conn:
-                c = conn.cursor()
-                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                c.execute('INSERT INTO users (name, email, password, last_active) VALUES (?, ?, ?, ?)',
-                          (name, email, hashed_password, datetime.datetime.utcnow()))
-                conn.commit()
+        conn = get_user_db_connection()
+        c = conn.cursor()
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        c.execute('INSERT INTO users (name, email, password, last_active) VALUES (?, ?, ?, ?)',
+                  (name, email, hashed_password, datetime.datetime.utcnow()))
+        conn.commit()
+        conn.close()
         token = jwt.encode({
             'email': email,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
@@ -219,15 +178,11 @@ def register():
         return jsonify({'token': token}), 201
     except sqlite3.IntegrityError:
         return jsonify({'message': 'Email already registered'}), 400
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error during registration: {e}")
-        return jsonify({'message': 'Database is temporarily unavailable. Please try again.'}), 503
     except sqlite3.Error as e:
         logger.error(f"Database error during registration: {e}")
         return jsonify({'message': f'Database error: {str(e)}'}), 500
 
 @api_bp.route('/login', methods=['POST'])
-@limiter.limit("5 per minute")
 def login():
     data = request.get_json()
     email = data.get('email')
@@ -235,24 +190,22 @@ def login():
     if not email or not password:
         return jsonify({'message': 'Missing required fields'}), 400
     try:
-        with get_user_db_connection() as conn:
-            c = conn.cursor()
-            c.execute('SELECT * FROM users WHERE email = ?', (email,))
-            user = c.fetchone()
-            if user and check_password_hash(user['password'], password):
-                c.execute('UPDATE users SET last_active = ? WHERE email = ?',
-                         (datetime.datetime.utcnow(), email))
-                conn.commit()
-            if user and check_password_hash(user['password'], password):
-                token = jwt.encode({
-                    'email': email,
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-                }, app.config['SECRET_KEY'], algorithm="HS256")
-                return jsonify({'token': token}), 200
-            return jsonify({'message': 'Incorrect email or password'}), 401
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error during login: {e}")
-        return jsonify({'message': 'Database is temporarily unavailable. Please try again.'}), 503
+        conn = get_user_db_connection()
+        c = conn.cursor()
+        c.execute('SELECT * FROM users WHERE email = ?', (email,))
+        user = c.fetchone()
+        if user and check_password_hash(user['password'], password):
+            c.execute('UPDATE users SET last_active = ? WHERE email = ?',
+                     (datetime.datetime.utcnow(), email))
+            conn.commit()
+        conn.close()
+        if user and check_password_hash(user['password'], password):
+            token = jwt.encode({
+                'email': email,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+            }, app.config['SECRET_KEY'], algorithm="HS256")
+            return jsonify({'token': token}), 200
+        return jsonify({'message': 'Incorrect email or password'}), 401
     except sqlite3.Error as e:
         logger.error(f"Database error during login: {e}")
         return jsonify({'message': f'Database error: {str(e)}'}), 500
@@ -263,7 +216,7 @@ def profile(current_user):
     return jsonify({
         'name': current_user['name'],
         'email': current_user['email'],
-        'test_history': json.loads(current_user['test_history'])
+        'test_history': current_user['test_history']
     }), 200
 
 @api_bp.route('/logout', methods=['POST'])
@@ -273,7 +226,6 @@ def logout(current_user):
 
 @api_bp.route('/submit_test', methods=['POST'])
 @token_required
-@limiter.limit("5 per minute")
 def submit_test(current_user):
     data = request.get_json()
     score = data.get('score')
@@ -281,23 +233,20 @@ def submit_test(current_user):
     if score is None or not result:
         return jsonify({'message': 'Missing required fields'}), 400
     try:
-        with user_db_lock:
-            with get_user_db_connection() as conn:
-                c = conn.cursor()
-                test_history = json.loads(current_user['test_history'])
-                new_test = {
-                    'test_date': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-                    'score': score,
-                    'result': result
-                }
-                test_history.append(new_test)
-                c.execute('UPDATE users SET test_history = ? WHERE email = ?',
-                         (json.dumps(test_history), current_user['email']))
-                conn.commit()
+        conn = get_user_db_connection()
+        c = conn.cursor()
+        test_history = json.loads(current_user['test_history'])
+        new_test = {
+            'test_date': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            'score': score,
+            'result': result
+        }
+        test_history.append(new_test)
+        c.execute('UPDATE users SET test_history = ? WHERE email = ?',
+                 (json.dumps(test_history), current_user['email']))
+        conn.commit()
+        conn.close()
         return jsonify({'message': 'Test submitted successfully'}), 200
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error during test submission: {e}")
-        return jsonify({'message': 'Database is temporarily unavailable. Please try again.'}), 503
     except sqlite3.Error as e:
         logger.error(f"Database error during test submission: {e}")
         return jsonify({'message': f'Database error: {str(e)}'}), 500
@@ -312,27 +261,30 @@ def dashboard():
         flash('Please log in to access the dashboard', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.error(f"No admin found for username: {session['username']}")
             session.pop('username', None)
             session.pop('user_id', None)
             flash('Admin account not found. Please log in again.', 'danger')
             return redirect(url_for('backend.login'))
-        with get_user_db_connection() as conn:
-            user_count = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
-            users = conn.execute('SELECT test_history FROM users').fetchall()
-            test_count = sum(len(json.loads(user['test_history'])) for user in users)
-            thirty_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=30)
-            new_user_count = conn.execute('SELECT COUNT(*) FROM users WHERE created_at >= ?',
-                                        (thirty_days_ago,)).fetchone()[0]
-            seven_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=7)
-            active_user_count = conn.execute('SELECT COUNT(*) FROM users WHERE last_active >= ?',
-                                           (seven_days_ago,)).fetchone()[0]
-            users = conn.execute('SELECT id, name, email, test_history, created_at FROM users').fetchall()
-        with get_expert_db_connection() as conn:
-            experts = conn.execute('SELECT id, name, email, specialization, created_at FROM experts').fetchall()
+        conn = get_user_db_connection()
+        user_count = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        users = conn.execute('SELECT test_history FROM users').fetchall()
+        test_count = sum(len(json.loads(user['test_history'])) for user in users)
+        thirty_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+        new_user_count = conn.execute('SELECT COUNT(*) FROM users WHERE created_at >= ?',
+                                    (thirty_days_ago,)).fetchone()[0]
+        seven_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+        active_user_count = conn.execute('SELECT COUNT(*) FROM users WHERE last_active >= ?',
+                                       (seven_days_ago,)).fetchone()[0]
+        users = conn.execute('SELECT id, name, email, test_history, created_at FROM users').fetchall()
+        conn.close()
+        conn = get_expert_db_connection()
+        experts = conn.execute('SELECT id, name, email, specialization, created_at FROM experts').fetchall()
+        conn.close()
         logger.debug(f"Rendering dashboard with admin: {admin['username']}, users: {user_count}, tests: {test_count}")
         return render_template('dashboard.html',
                              admin=admin,
@@ -342,10 +294,6 @@ def dashboard():
                              active_user_count=active_user_count,
                              users=users,
                              experts=experts)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in dashboard: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.login'))
     except sqlite3.Error as e:
         logger.error(f"Database error in dashboard: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -362,8 +310,9 @@ def edit_profile():
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.warning(f"No admin found for username: {session['username']}")
             flash('Admin not found', 'danger')
@@ -378,42 +327,42 @@ def edit_profile():
                 flash('Name and email are required', 'danger')
                 return render_template('edit-profile.html', admin=admin)
             try:
-                with admin_db_lock:
-                    with get_admin_db_connection() as conn:
-                        c = conn.cursor()
-                        image_path = admin['profile_image']
-                        if profile_image and allowed_file(profile_image.filename):
-                            filename = secure_filename(profile_image.filename)
-                            unique_filename = f"{admin['id']}_{filename}"
-                            save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-                            logger.debug(f"Saving profile image to filesystem: {save_path}")
-                            profile_image.save(save_path)
-                            image_path = f"/static/uploads/{unique_filename}?v={int(time.time())}"
-                            logger.debug(f"Storing image path in database: {image_path}")
-                        if password:
-                            if len(password) < 6:
-                                flash('Password must be at least 6 characters', 'danger')
-                                return render_template('edit-profile.html', admin=admin)
-                            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                            c.execute('UPDATE admins SET name = ?, email = ?, password = ?, profile_image = ? WHERE username = ?',
-                                     (name, email, hashed_password, image_path, session['username']))
-                        else:
-                            c.execute('UPDATE admins SET name = ?, email = ?, profile_image = ? WHERE username = ?',
-                                     (name, email, image_path, session['username']))
-                        conn.commit()
-                        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+                conn = get_admin_db_connection()
+                c = conn.cursor()
+                image_path = admin['profile_image']
+                if profile_image and allowed_file(profile_image.filename):
+                    filename = secure_filename(profile_image.filename)
+                    unique_filename = f"{admin['id']}_{filename}"
+                    # Save to filesystem
+                    save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    logger.debug(f"Saving profile image to filesystem: {save_path}")
+                    profile_image.save(save_path)
+                    # Store relative path with cache-busting
+                    image_path = f"/static/uploads/{unique_filename}?v={int(time.time())}"
+                    logger.debug(f"Storing image path in database: {image_path}")
+                if password:
+                    if len(password) < 6:
+                        flash('Password must be at least 6 characters', 'danger')
+                        return render_template('edit-profile.html', admin=admin)
+                    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                    c.execute('UPDATE admins SET name = ?, email = ?, password = ?, profile_image = ? WHERE username = ?',
+                             (name, email, hashed_password, image_path, session['username']))
+                else:
+                    c.execute('UPDATE admins SET name = ?, email = ?, profile_image = ? WHERE username = ?',
+                             (name, email, image_path, session['username']))
+                conn.commit()
+                logger.debug(f"Database updated for admin: {session['username']}, new image_path: {image_path}")
+                # Fetch updated admin object
+                admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+                conn.close()
                 flash('Profile updated successfully', 'success')
                 return redirect(url_for('backend.dashboard'))
             except sqlite3.IntegrityError as e:
                 logger.error(f"Integrity error in edit-profile: {str(e)}")
                 flash('Email already registered', 'danger')
                 return render_template('edit-profile.html', admin=admin)
-            except sqlite3.OperationalError as e:
-                logger.error(f"Database operational error in edit-profile: {e}")
-                flash('Database is temporarily unavailable. Please try again.', 'danger')
-                return render_template('edit-profile.html', admin=admin)
             except sqlite3.Error as e:
-                logger.error(f"Database error in edit-profile: {e}")
+                logger.error(f"Database error in edit-profile: {str(e)}")
                 flash(f'Database error: {str(e)}', 'danger')
                 return render_template('edit-profile.html', admin=admin)
             except OSError as e:
@@ -425,16 +374,12 @@ def edit_profile():
                 flash(f'Unexpected error: {str(e)}', 'danger')
                 return render_template('edit-profile.html', admin=admin)
         return render_template('edit-profile.html', admin=admin)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in edit-profile (GET): {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.dashboard'))
     except sqlite3.Error as e:
-        logger.error(f"Database error in edit-profile (GET): {e}")
+        logger.error(f"Database error in edit-profile (GET): {str(e)}")
         flash(f'Database error: {str(e)}', 'danger')
         return redirect(url_for('backend.dashboard'))
     except Exception as e:
-        logger.error(f"Unexpected error in edit-profile (GET): {e}")
+        logger.error(f"Unexpected error in edit-profile (GET): {str(e)}")
         flash(f'Unexpected error: {str(e)}', 'danger')
         return redirect(url_for('backend.dashboard'))
 
@@ -445,8 +390,9 @@ def add_expert():
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.warning(f"No admin found for username: {session['username']}")
             flash('Admin not found', 'danger')
@@ -463,31 +409,23 @@ def add_expert():
                 flash('Password must be at least 6 characters', 'danger')
                 return render_template('add-expert.html', admin=admin)
             try:
-                with expert_db_lock:
-                    with get_expert_db_connection() as conn:
-                        c = conn.cursor()
-                        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                        c.execute('INSERT INTO experts (name, email, password, specialization) VALUES (?, ?, ?, ?)',
-                                  (name, email, hashed_password, specialization))
-                        conn.commit()
+                conn = get_expert_db_connection()
+                c = conn.cursor()
+                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                c.execute('INSERT INTO experts (name, email, password, specialization) VALUES (?, ?, ?, ?)',
+                          (name, email, hashed_password, specialization))
+                conn.commit()
+                conn.close()
                 flash('Expert added successfully', 'success')
                 return redirect(url_for('backend.dashboard'))
             except sqlite3.IntegrityError:
                 flash('Email already registered', 'danger')
-                return render_template('add-expert.html', admin=admin)
-            except sqlite3.OperationalError as e:
-                logger.error(f"Database operational error in add-expert: {e}")
-                flash('Database is temporarily unavailable. Please try again.', 'danger')
                 return render_template('add-expert.html', admin=admin)
             except sqlite3.Error as e:
                 logger.error(f"Database error in add-expert: {e}")
                 flash(f'Database error: {str(e)}', 'danger')
                 return render_template('add-expert.html', admin=admin)
         return render_template('add-expert.html', admin=admin)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in add-expert: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.dashboard'))
     except sqlite3.Error as e:
         logger.error(f"Database error in add-expert: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -500,14 +438,16 @@ def edit_expert(id):
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.warning(f"No admin found for username: {session['username']}")
             flash('Admin not found', 'danger')
             return redirect(url_for('backend.login'))
-        with get_expert_db_connection() as conn:
-            expert = conn.execute('SELECT * FROM experts WHERE id = ?', (id,)).fetchone()
+        conn = get_expert_db_connection()
+        expert = conn.execute('SELECT * FROM experts WHERE id = ?', (id,)).fetchone()
+        conn.close()
         if not expert:
             logger.warning(f"No expert found for id: {id}")
             flash('Expert not found', 'danger')
@@ -521,38 +461,30 @@ def edit_expert(id):
                 flash('Name, email, and specialization are required', 'danger')
                 return render_template('edit-expert.html', expert=expert, admin=admin)
             try:
-                with expert_db_lock:
-                    with get_expert_db_connection() as conn:
-                        c = conn.cursor()
-                        if password:
-                            if len(password) < 6:
-                                flash('Password must be at least 6 characters', 'danger')
-                                return render_template('edit-expert.html', expert=expert, admin=admin)
-                            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                            c.execute('UPDATE experts SET name = ?, email = ?, password = ?, specialization = ? WHERE id = ?',
-                                      (name, email, hashed_password, specialization, id))
-                        else:
-                            c.execute('UPDATE experts SET name = ?, email = ?, specialization = ? WHERE id = ?',
-                                      (name, email, specialization, id))
-                        conn.commit()
+                conn = get_expert_db_connection()
+                c = conn.cursor()
+                if password:
+                    if len(password) < 6:
+                        flash('Password must be at least 6 characters', 'danger')
+                        return render_template('edit-expert.html', expert=expert, admin=admin)
+                    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                    c.execute('UPDATE experts SET name = ?, email = ?, password = ?, specialization = ? WHERE id = ?',
+                              (name, email, hashed_password, specialization, id))
+                else:
+                    c.execute('UPDATE experts SET name = ?, email = ?, specialization = ? WHERE id = ?',
+                              (name, email, specialization, id))
+                conn.commit()
+                conn.close()
                 flash('Expert updated successfully', 'success')
                 return redirect(url_for('backend.dashboard'))
             except sqlite3.IntegrityError:
                 flash('Email already registered', 'danger')
-                return render_template('edit-expert.html', expert=expert, admin=admin)
-            except sqlite3.OperationalError as e:
-                logger.error(f"Database operational error in edit-expert: {e}")
-                flash('Database is temporarily unavailable. Please try again.', 'danger')
                 return render_template('edit-expert.html', expert=expert, admin=admin)
             except sqlite3.Error as e:
                 logger.error(f"Database error in edit-expert: {e}")
                 flash(f'Database error: {str(e)}', 'danger')
                 return render_template('edit-expert.html', expert=expert, admin=admin)
         return render_template('edit-expert.html', expert=expert, admin=admin)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in edit-expert: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.dashboard'))
     except sqlite3.Error as e:
         logger.error(f"Database error in edit-expert: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -565,15 +497,12 @@ def delete_expert(id):
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with expert_db_lock:
-            with get_expert_db_connection() as conn:
-                c = conn.cursor()
-                c.execute('DELETE FROM experts WHERE id = ?', (id,))
-                conn.commit()
+        conn = get_expert_db_connection()
+        c = conn.cursor()
+        c.execute('DELETE FROM experts WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
         flash('Expert deleted successfully', 'success')
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in delete-expert: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
     except sqlite3.Error as e:
         logger.error(f"Database error in delete-expert: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -586,19 +515,17 @@ def expert_management():
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.warning(f"No admin found for username: {session['username']}")
             flash('Admin not found', 'danger')
             return redirect(url_for('backend.login'))
-        with get_expert_db_connection() as conn:
-            experts = conn.execute('SELECT id, name, email, specialization, created_at FROM experts').fetchall()
+        conn = get_expert_db_connection()
+        experts = conn.execute('SELECT id, name, email, specialization, created_at FROM experts').fetchall()
+        conn.close()
         return render_template('expert-management.html', experts=experts, admin=admin)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in expert-management: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.dashboard'))
     except sqlite3.Error as e:
         logger.error(f"Database error in expert-management: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -611,8 +538,9 @@ def add_user():
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.warning(f"No admin found for username: {session['username']}")
             flash('Admin not found', 'danger')
@@ -628,31 +556,23 @@ def add_user():
                 flash('Password must be at least 6 characters', 'danger')
                 return render_template('add-user.html', admin=admin)
             try:
-                with user_db_lock:
-                    with get_user_db_connection() as conn:
-                        c = conn.cursor()
-                        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                        c.execute('INSERT INTO users (name, email, password, last_active) VALUES (?, ?, ?, ?)',
-                                  (name, email, hashed_password, datetime.datetime.utcnow()))
-                        conn.commit()
+                conn = get_user_db_connection()
+                c = conn.cursor()
+                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                c.execute('INSERT INTO users (name, email, password, last_active) VALUES (?, ?, ?, ?)',
+                          (name, email, hashed_password, datetime.datetime.utcnow()))
+                conn.commit()
+                conn.close()
                 flash('User added successfully', 'success')
                 return redirect(url_for('backend.dashboard'))
             except sqlite3.IntegrityError:
                 flash('Email already registered', 'danger')
-                return render_template('add-user.html', admin=admin)
-            except sqlite3.OperationalError as e:
-                logger.error(f"Database operational error in add-user: {e}")
-                flash('Database is temporarily unavailable. Please try again.', 'danger')
                 return render_template('add-user.html', admin=admin)
             except sqlite3.Error as e:
                 logger.error(f"Database error in add-user: {e}")
                 flash(f'Database error: {str(e)}', 'danger')
                 return render_template('add-user.html', admin=admin)
         return render_template('add-user.html', admin=admin)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in add-user: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.dashboard'))
     except sqlite3.Error as e:
         logger.error(f"Database error in add-user: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -665,14 +585,16 @@ def edit_user(id):
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with get_admin_db_connection() as conn:
-            admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn = get_admin_db_connection()
+        admin = conn.execute('SELECT * FROM admins WHERE username = ?', (session['username'],)).fetchone()
+        conn.close()
         if not admin:
             logger.warning(f"No admin found for username: {session['username']}")
             flash('Admin not found', 'danger')
             return redirect(url_for('backend.login'))
-        with get_user_db_connection() as conn:
-            user = conn.execute('SELECT * FROM users WHERE id = ?', (id,)).fetchone()
+        conn = get_user_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (id,)).fetchone()
+        conn.close()
         if not user:
             logger.warning(f"No user found for id: {id}")
             flash('User not found', 'danger')
@@ -685,38 +607,30 @@ def edit_user(id):
                 flash('Name and email are required', 'danger')
                 return render_template('edit-user.html', user=user, admin=admin)
             try:
-                with user_db_lock:
-                    with get_user_db_connection() as conn:
-                        c = conn.cursor()
-                        if password:
-                            if len(password) < 6:
-                                flash('Password must be at least 6 characters', 'danger')
-                                return render_template('edit-user.html', user=user, admin=admin)
-                            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                            c.execute('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
-                                      (name, email, hashed_password, id))
-                        else:
-                            c.execute('UPDATE users SET name = ?, email = ? WHERE id = ?',
-                                      (name, email, id))
-                        conn.commit()
+                conn = get_user_db_connection()
+                c = conn.cursor()
+                if password:
+                    if len(password) < 6:
+                        flash('Password must be at least 6 characters', 'danger')
+                        return render_template('edit-user.html', user=user, admin=admin)
+                    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                    c.execute('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
+                              (name, email, hashed_password, id))
+                else:
+                    c.execute('UPDATE users SET name = ?, email = ? WHERE id = ?',
+                              (name, email, id))
+                conn.commit()
+                conn.close()
                 flash('User updated successfully', 'success')
                 return redirect(url_for('backend.dashboard'))
             except sqlite3.IntegrityError:
                 flash('Email already registered', 'danger')
-                return render_template('edit-user.html', user=user, admin=admin)
-            except sqlite3.OperationalError as e:
-                logger.error(f"Database operational error in edit-user: {e}")
-                flash('Database is temporarily unavailable. Please try again.', 'danger')
                 return render_template('edit-user.html', user=user, admin=admin)
             except sqlite3.Error as e:
                 logger.error(f"Database error in edit-user: {e}")
                 flash(f'Database error: {str(e)}', 'danger')
                 return render_template('edit-user.html', user=user, admin=admin)
         return render_template('edit-user.html', user=user, admin=admin)
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in edit-user: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
-        return redirect(url_for('backend.dashboard'))
     except sqlite3.Error as e:
         logger.error(f"Database error in edit-user: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -729,15 +643,12 @@ def delete_user(id):
         flash('Please log in to access this page', 'danger')
         return redirect(url_for('backend.login'))
     try:
-        with user_db_lock:
-            with get_user_db_connection() as conn:
-                c = conn.cursor()
-                c.execute('DELETE FROM users WHERE id = ?', (id,))
-                conn.commit()
+        conn = get_user_db_connection()
+        c = conn.cursor()
+        c.execute('DELETE FROM users WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
         flash('User deleted successfully', 'success')
-    except sqlite3.OperationalError as e:
-        logger.error(f"Database operational error in delete-user: {e}")
-        flash('Database is temporarily unavailable. Please try again.', 'danger')
     except sqlite3.Error as e:
         logger.error(f"Database error in delete-user: {e}")
         flash(f'Database error: {str(e)}', 'danger')
@@ -756,8 +667,9 @@ def login():
             flash(error_message, 'danger')
             return render_template('login.html')
         try:
-            with get_admin_db_connection() as conn:
-                user = conn.execute('SELECT * FROM admins WHERE username = ?', (username,)).fetchone()
+            conn = get_admin_db_connection()
+            user = conn.execute('SELECT * FROM admins WHERE username = ?', (username,)).fetchone()
+            conn.close()
             if user and check_password_hash(user['password'], password):
                 session['username'] = username
                 session['user_id'] = user['id']
@@ -777,13 +689,6 @@ def login():
                     return jsonify({'success': False, 'message': error_message}), 401
                 flash(error_message, 'danger')
                 return render_template('login.html')
-        except sqlite3.OperationalError as e:
-            logger.error(f"Database operational error during admin login: {e}")
-            error_message = 'Database is temporarily unavailable. Please try again.'
-            if is_ajax:
-                return jsonify({'success': False, 'message': error_message}), 503
-            flash(error_message, 'danger')
-            return render_template('login.html')
         except sqlite3.Error as e:
             logger.error(f"Database error during admin login: {e}")
             error_message = f'Database error: {str(e)}'
