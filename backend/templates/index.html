@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Basic -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
   <meta name="keywords" content="depression test, meditation, mental health" />
   <meta name="description" content="A platform offering depression tests and meditation resources for mental well-being." />
   <meta name="author" content="" />
@@ -28,7 +25,6 @@
 
   <!-- Custom styles for this template -->
   <link href="../static/assetes/css/style.css" rel="stylesheet" />
-  <!-- Responsive style -->
   <link href="../static/assetes/css/responsive.css" rel="stylesheet" />
 
   <!-- Custom styles for navbar buttons and modals -->
@@ -667,13 +663,17 @@
   <script type="text/javascript" src="../static/assetes/js/custom.js"></script>
   <!-- Google Map -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap"></script>
-  <!-- End Google Map -->
 
   <script>
-    // Initialize navbar based on login status
+    // Validate JWT token format
+    function isValidToken(token) {
+      return token && /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(token);
+    }
+
+    // Update navbar based on login status
     function updateNavbar() {
       const token = localStorage.getItem('jwtToken');
-      if (token) {
+      if (token && isValidToken(token)) {
         document.getElementById('login-nav').style.display = 'none';
         document.getElementById('register-nav').style.display = 'none';
         document.getElementById('profile-nav').style.display = 'block';
@@ -681,6 +681,7 @@
         document.getElementById('login-nav').style.display = 'block';
         document.getElementById('register-nav').style.display = 'block';
         document.getElementById('profile-nav').style.display = 'none';
+        localStorage.removeItem('jwtToken'); // Clear invalid token
       }
     }
 
@@ -709,10 +710,15 @@
         const data = await response.json();
 
         if (response.ok) {
-          localStorage.setItem('jwtToken', data.token);
-          $('#loginModal').modal('hide');
-          updateNavbar();
-          document.getElementById('loginForm').reset();
+          if (isValidToken(data.token)) {
+            localStorage.setItem('jwtToken', data.token);
+            $('#loginModal').modal('hide');
+            updateNavbar();
+            document.getElementById('loginForm').reset();
+          } else {
+            loginPasswordError.textContent = 'Invalid token received from server.';
+            loginPasswordError.style.display = 'block';
+          }
         } else {
           loginPasswordError.textContent = data.message || 'Incorrect email or password.';
           loginPasswordError.style.display = 'block';
@@ -760,10 +766,15 @@
         const data = await response.json();
 
         if (response.ok) {
-          localStorage.setItem('jwtToken', data.token);
-          $('#registerModal').modal('hide');
-          updateNavbar();
-          document.getElementById('registerForm').reset();
+          if (isValidToken(data.token)) {
+            localStorage.setItem('jwtToken', data.token);
+            $('#registerModal').modal('hide');
+            updateNavbar();
+            document.getElementById('registerForm').reset();
+          } else {
+            emailError.textContent = 'Invalid token received from server.';
+            emailError.style.display = 'block';
+          }
         } else {
           emailError.textContent = data.message || 'Email already registered.';
           emailError.style.display = 'block';
@@ -777,8 +788,11 @@
     // Populate profile modal
     $('#profileModal').on('show.bs.modal', async function() {
       const token = localStorage.getItem('jwtToken');
-      if (!token) {
+      if (!token || !isValidToken(token)) {
         $('#profileModal').modal('hide');
+        alert('Invalid or missing session. Please log in again.');
+        localStorage.removeItem('jwtToken');
+        updateNavbar();
         return;
       }
 
@@ -793,7 +807,9 @@
           document.getElementById('profileName').textContent = data.name || 'N/A';
           document.getElementById('profileEmail').textContent = data.email;
         } else {
-          alert(data.message || 'Failed to load profile.');
+          alert(data.message || 'Failed to load profile. Please log in again.');
+          localStorage.removeItem('jwtToken');
+          updateNavbar();
           $('#profileModal').modal('hide');
         }
       } catch (error) {
@@ -803,18 +819,15 @@
     });
 
     // Handle logout
-    async function logout() {
-      try {
-        await fetch('/api/logout', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` }
-        });
-      } catch (error) {
-        console.error('Logout error:', error);
-      }
+    function logout() {
       localStorage.removeItem('jwtToken');
       $('#profileModal').modal('hide');
       updateNavbar();
+      // Optional: Notify server of logout (if using token blacklist)
+      fetch('/api/logout', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` }
+      }).catch(error => console.error('Logout error:', error));
     }
 
     // Initialize navbar on page load
